@@ -1,0 +1,137 @@
+from Symbol import Symbol
+from Result import Result
+from math import log, pow
+
+
+class ExpressionInterpreter:
+    expression = ''
+    actualSymbol = Symbol.Default
+    pos = 0
+    numbers = []
+    operations = []
+    result = Result.OK
+    char_to_symbol = {
+        '+': Symbol.Addition,
+        '-': Symbol.Subtraction,
+        '*': Symbol.Multiplication,
+        '/': Symbol.Division,
+        '%': Symbol.Modulus,
+        '^': Symbol.Exponential,
+        'L': Symbol.Logarithm,
+        '(': Symbol.OpenParenthesis,
+        ')': Symbol.CloseParenthesis
+    }
+
+    def __addition(self, a, b):
+        a, b = self.__limits(a, b, bottom_result=0)
+        return b + a
+
+    def __subtraction(self, a, b):
+        a, b = self.__limits(a, b, bottom_result=0)
+        return b - a
+
+    def __multiplication(self, a, b):
+        a, b = self.__limits(a, b, bottom_result=0)
+        return b * a
+
+    def __division(self, a, b):
+        incorrect_input = a == 0
+        a = self.__limit(a)
+        b = self.__limit(b, bottom_result=0)
+        return b / a, incorrect_input
+
+    def __modulus(self, a, b):
+        a, b = self.__limits(a, b)
+        return b % a
+
+    def __exponential(self, a, b):
+        a = self.__limit(a, 100, 0.01)
+        b = self.__limit(b)
+        return pow(b, a)
+
+    def __logarithm(self, a, b):
+        incorrect_input = a == 0
+        a = self.__limit(a, 100, 2, 100, 2)
+        b = self.__limit(b)
+        return log(b, a), incorrect_input
+
+    def __pop(self):
+        return self.numbers[-1].pop()
+
+    def __push(self, a):
+        self.numbers[-1].push(a)
+
+    def __count(self):
+        return len(self.numbers[-1])
+
+    def __operation_pop(self):
+        return self.operations[-1].pop()
+
+    def __operation_push(self, a: Symbol):
+        self.operations[-1].push(a)
+
+    def __operation_count(self):
+        return len(self.operations[-1])
+
+    def __apply_operation(self):
+        if len(self.operations) <= 0:
+            return
+        if self.__count() > 1:
+            operation = self.__operation_pop()
+            if operation == Symbol.Addition:
+                self.__push(self.__addition(self.__pop(), self.__pop()))
+            elif operation == Symbol.Subtraction:
+                self.__push(self.__subtraction(self.__pop(), self.__pop()))
+            elif operation == Symbol.Multiplication:
+                self.__push(self.__multiplication(self.__pop(), self.__pop()))
+            elif operation == Symbol.Division:
+                res, incorrect_input = self.__division(self.__pop(), self.__pop())
+                self.__push(res)
+                if incorrect_input:
+                    self.result = Result.DivisionByZero
+            elif operation == Symbol.Modulus:
+                self.__push(self.__modulus(self.__pop(), self.__pop()))
+            elif operation == Symbol.Exponential:
+                self.__push(self.__exponential(self.__pop(), self.__pop()))
+            elif operation == Symbol.Logarithm:
+                res, incorrect_input = self.__logarithm(self.__pop(), self.__pop())
+                self.__push(res)
+                if incorrect_input:
+                    self.result = Result.LogarithmWrongInputs
+        else:
+            self.result = Result.NumberStackWrongElements
+
+    def __get_next_symbol(self):
+        c = ''
+        if self.pos >= len(self.expression):
+            return Symbol.ExpressionEnd
+        c = self.expression[self.pos]
+        self.pos += 1
+
+
+    def compute(self, expression: str):
+        self.numbers = []
+        self.numbers.append([])
+        self.operations = []
+        self.operations.append([])
+        self.expression = expression  # TODO: Check if clone is necessary or not
+        self.pos = 0
+        try:
+
+        except Exception as e:
+            a = 0
+
+    def __limit(self, a, top_threshold=100000000000000, bottom_threshold=0.00000000001, top_result=100000000000000,
+                bottom_result=0.00000000001):
+        if a > top_threshold:
+            a = top_result
+        elif a < -top_threshold:
+            a = -top_result
+        elif (bottom_threshold > a > 0) or a == 0:
+            a = bottom_result
+        elif -bottom_threshold < a <= 0:
+            a = -bottom_result
+        return a
+
+    def __limits(self, a, b, bottom_result=0.00000000001):
+        return self.__limit(a, bottom_result=bottom_result), self.__limit(b, bottom_result=bottom_result)
