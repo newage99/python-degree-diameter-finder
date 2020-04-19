@@ -36,8 +36,8 @@ class ExpressionInterpreter:
 
     def __division(self, a, b):
         incorrect_input = a == 0
-        a = self.__limit(a)
-        b = self.__limit(b, bottom_result=0)
+        a, limit_reached = self.__limit(a)
+        b, limit_reached = self.__limit(b, bottom_result=0)
         return b / a, incorrect_input
 
     def __modulus(self, a, b):
@@ -45,8 +45,10 @@ class ExpressionInterpreter:
         return b % a
 
     def __exponential(self, a, b):
-        a = self.__limit(a, 100, 0.01)
-        b = self.__limit(b)
+        a, limit_reached = self.__limit(a, 100, 0.01)
+        if limit_reached:
+            return a
+        b, limit_reached = self.__limit(b)
         return pow(b, a)
 
     def __logarithm(self, a, b):
@@ -154,15 +156,20 @@ class ExpressionInterpreter:
 
     def __limit(self, a, top_threshold=100000000000000, bottom_threshold=0.00000000001, top_result=100000000000000,
                 bottom_result=0.00000000001):
+        limit_reached = False
         if a > top_threshold:
             a = top_result
+            limit_reached = True
         elif a < -top_threshold:
             a = -top_result
+            limit_reached = True
         elif (bottom_threshold > a > 0) or a == 0:
             a = bottom_result
+            limit_reached = True
         elif -bottom_threshold < a <= 0:
             a = -bottom_result
-        return a
+            limit_reached = True
+        return a, limit_reached
 
     def __limits(self, a, b, bottom_result=0.00000000001):
-        return self.__limit(a, bottom_result=bottom_result), self.__limit(b, bottom_result=bottom_result)
+        return self.__limit(a, bottom_result=bottom_result)[0], self.__limit(b, bottom_result=bottom_result)[0]
