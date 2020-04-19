@@ -11,3 +11,5 @@ class Result(Enum):
     CloseParenthesisMissing = 7
     GetNextSymbolWrongSymbol = 8
     NumberStackWrongElements = 9
+    WrongOperation = 10
+    CloseParenthesisWrongStructure = 11

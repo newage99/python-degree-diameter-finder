@@ -1,19 +1,6 @@
-import sys
-from PyQt5 import QtGui, QtWidgets
-__all__ = [QtGui, QtWidgets]
-
-
-def window():
-    app = QtWidgets.QApplication(sys.argv)
-    w = QtWidgets.QWidget()
-    b = QtWidgets.QLabel(w)
-    b.setText("Hello World!")
-    w.setGeometry(100, 100, 400, 200)
-    b.move(50, 20)
-    w.setWindowTitle('PyQt')
-    w.show()
-    sys.exit(app.exec_())
-
+from ExpressionInterpreter import ExpressionInterpreter
 
 if __name__ == '__main__':
-    window()
+    ei = ExpressionInterpreter()
+    result = ei.compute("(10/2)*((6*(2/4))+2)")
+    a = result
