@@ -27,6 +27,7 @@ class ExpressionInterpreter:
         return b + a
 
     def __subtraction(self, a, b):
+        # TODO: Consider negation!
         a, b = self.__limits(a, b, bottom_result=0)
         return b - a
 
