@@ -130,7 +130,6 @@ class ExpressionInterpreter:
         self.numbers = []
         self.numbers.append([])
         self.operations = []
-        # self.operations.append([])
         self.expression = expression
         self.pos = 0
         try:
@@ -140,11 +139,9 @@ class ExpressionInterpreter:
                     c = self.char_to_symbol[c]
                 if c == Symbol.OpenParenthesis:
                     self.numbers.append([])
-                    # self.operations.append([])
                 elif c == Symbol.CloseParenthesis and self.__count() == 1:
                     self.__push(self.numbers.pop()[0])
                 elif c in self.char_to_symbol.values():
-                    # self.__operation_push(c)
                     self.operations.append(c)
                 else:
                     self.__push(c)

@@ -8,7 +8,7 @@ if __name__ == '__main__':
     r = random_id(12)
     print(r)
     print('')
-    while x < 30:
+    while x < 300:
         id, pos, c, new_c = mutate_id(r)
         print(id + '  pos_to_mutate=' + str(pos) + '(' + c + '), mutated_to=' + new_c)
         x += 1

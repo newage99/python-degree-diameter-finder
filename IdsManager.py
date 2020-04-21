@@ -1,69 +1,5 @@
 import random
-
-variables = ["x", "y", "n"]
-numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-numbers_array = variables + numbers
-xyn_array = numbers_array + ["("]
-plus_minus_array = ["+", "-", "*", "/", "^", "L", "%", ")"]
-operators_array = ["+", "*", "/", "%", ")", "^", "L"]
-forbidden_right_chars = {
-    "x": xyn_array,
-    "y": xyn_array,
-    "n": xyn_array,
-    "+": plus_minus_array,
-    "-": plus_minus_array,
-    "*": operators_array,
-    "/": operators_array,
-    "%": operators_array,
-    "^": operators_array,
-    "L": operators_array,
-    "(": ["+", "*", "/", "%", ")", "^", "L"],
-    ")": numbers_array,
-    "0": numbers_array,
-    "1": numbers_array,
-    "2": numbers_array,
-    "3": numbers_array,
-    "4": numbers_array,
-    "5": numbers_array,
-    "6": numbers_array,
-    "7": numbers_array,
-    "8": numbers_array,
-    "9": numbers_array
-}
-array_left = variables + [")"] + numbers
-xyn_array_left = variables + [")"] + numbers
-operators_array_left = ["+", "-", "*", "/", "%", "^", "L", "("]
-sum_close_parenthesis_left = ["+", "-", "*", "/", "%", "^", "L", "("]
-forbidden_left_chars = {
-    "x": array_left,
-    "y": array_left,
-    "n": array_left,
-    "+": sum_close_parenthesis_left,
-    "-": ["+", "-"],
-    "*": operators_array_left,
-    "/": operators_array_left,
-    "%": operators_array_left,
-    "^": operators_array_left,
-    "L": operators_array_left,
-    "(": array_left,
-    ")": sum_close_parenthesis_left,
-    "0": array_left,
-    "1": array_left,
-    "2": array_left,
-    "3": array_left,
-    "4": array_left,
-    "5": array_left,
-    "6": array_left,
-    "7": array_left,
-    "8": array_left,
-    "9": array_left
-}
-every = 0
-characters = "+-*/%^L()xyn12"
-beginning = ""
-size = []
-calculation_thread = None
-calculation_on = True
+from global_variables import *
 
 
 def valid_close_parenthesis(id, parenthesis_counter):
@@ -124,25 +60,25 @@ def mutate_id(id):
     if pos_to_mutate + 4 > len(id) or id[pos_to_mutate + 1] == ')':
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
     operators = "+-*/%^L"
-    variables = "xyn12"
+    variables_and_numbers = "xyn12"
     char_to_mutate = id[pos_to_mutate]
     suffix = ''
     prefix = ''
     if char_to_mutate in operators:
-        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables, "")
+        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
         if pos_to_mutate + 1 < len(id) and id[pos_to_mutate + 1] == '-':
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
-        if char_to_mutate == '-' and (pos_to_mutate == 0 or id[pos_to_mutate - 1] == '('):
-            prefix = variables[random.randint(0, len(variables) - 1)]
-    elif char_to_mutate in variables or char_to_mutate == '(':
+        if char_to_mutate == '-' and (pos_to_mutate == 0 or id[pos_to_mutate - 1] == '(' or id[pos_to_mutate - 1] in operators):
+            prefix = variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
+    elif char_to_mutate in variables_and_numbers or char_to_mutate == '(':
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "")
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
     if char_to_mutate == '(' and id[pos_to_mutate + 1] != '-':
         suffix = operators[random.randint(0, len(operators) - 1)]
     elif char_to_mutate == ')':
-        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables, "")
-        suffix = variables[random.randint(0, len(variables) - 1)]
+        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
+        suffix = variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
 
     chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
     char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
@@ -159,7 +95,7 @@ def mutate_id(id):
         new_id = new_id[:pos_to_remove_close] + new_id[pos_to_remove_close + 1:]
     elif char_to_mutate == ')':
         if pos_to_mutate + 1 == len(new_id) and char_to_mutate_to in operators:
-            new_id += variables[random.randint(0, len(variables) - 1)]
+            new_id += variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
         open_parenthesis_positions = []
         pos = pos_to_mutate - 3
         while pos >= 0:
@@ -174,7 +110,7 @@ def mutate_id(id):
         if new_id[pos_to_mutate_plus_one] in operators and new_id[pos_to_mutate_plus_one] != '-':
             new_id = new_id[:pos_to_mutate_plus_one] + new_id[pos_to_mutate_plus_one + 1:]
         pos_to_mutate_minus_one = pos_to_mutate - 1
-        if pos_to_mutate_minus_one >= 0 and new_id[pos_to_mutate_minus_one] in variables:
+        if pos_to_mutate_minus_one >= 0 and new_id[pos_to_mutate_minus_one] in variables_and_numbers:
             new_id = new_id[:pos_to_mutate] + operators[random.randint(0, len(operators) - 1)] + new_id[pos_to_mutate:]
         valid_positions_to_close = []
         pos = pos_to_mutate + 4
@@ -189,14 +125,14 @@ def mutate_id(id):
             new_id = new_id[:pos_to_close] + ")" + new_id[pos_to_close:]
     elif char_to_mutate_to == ')':
         pos_to_mutate_plus_one = pos_to_mutate + 1
-        if pos_to_mutate_plus_one < len(new_id) and (new_id[pos_to_mutate_plus_one] in variables or new_id[pos_to_mutate_plus_one] == '('):
+        if pos_to_mutate_plus_one < len(new_id) and (new_id[pos_to_mutate_plus_one] in variables_and_numbers or new_id[pos_to_mutate_plus_one] == '('):
             new_id = new_id[:pos_to_mutate_plus_one] + operators[random.randint(0, len(operators) - 1)] + new_id[pos_to_mutate_plus_one:]
         if char_to_mutate == '-' and new_id[pos_to_mutate - 1] in operators:
             new_id = new_id[:pos_to_mutate - 1] + new_id[pos_to_mutate:]
         valid_positions_to_insert_open = []
         pos = pos_to_mutate - 3
         while pos >= 0:
-            if new_id[pos] in variables or new_id[pos] == '(':
+            if new_id[pos] in variables_and_numbers or new_id[pos] == '(':
                 valid_positions_to_insert_open.append(pos)
             pos -= 1
         if len(valid_positions_to_insert_open) <= 0:
