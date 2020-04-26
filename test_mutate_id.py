@@ -1,11 +1,11 @@
 from IdsManager import random_id, mutate_id
 from global_variables import *
 
-if __name__ == '__main__':
+ids_lengths = [3, 5, 10, 25, 100]
+number_of_mutation_per_id = 10
+ids_per_length = 4
 
-    ids_lengths = [3, 5, 10, 25, 100]
-    number_of_mutation_per_id = 10
-    ids_per_length = 4
+if __name__ == '__main__':
 
     for length in ids_lengths:
         for i in range(1, ids_per_length + 1):
@@ -16,15 +16,21 @@ if __name__ == '__main__':
                 mutated_id_len = len(mutated_id)
                 parenthesis_counter = 0
                 for j in range(mutated_id_len):
+                    if mutated_id[j] == '(':
+                        parenthesis_counter += 1
+                    elif mutated_id[j] == ')':
+                        parenthesis_counter -= 1
+                    error = ''
                     if j > 0 and mutated_id[j-1] in forbidden_left_chars[mutated_id[j]]:
-                        print('')
-                        print(mutated_id)
-                        print(('' * j) + '^  char ' + mutated_id[j] + ' must not be preceded by char ' + mutated_id[j-1])
-                        exit(0)
+                        error = 'L'
                     elif j+1 < mutated_id_len and mutated_id[j+1] in forbidden_right_chars[mutated_id[j]]:
+                        error = 'R'
+                    if error != '':
                         print('')
                         print(mutated_id)
-                        print(('' * j) + '^  char ' + mutated_id[j] + ' must not be followed by char ' + mutated_id[j+1])
+                        print((' ' * j) + '^ char \'' + mutated_id[j] + '\' must not be ' + (
+                            'preceded' if error == 'L' else 'followed') + ' by char \'' + mutated_id[
+                                  j + (1 if error == 'R' else -1)] + '\'')
                         exit(0)
                 if parenthesis_counter != 0:
                     print('')
