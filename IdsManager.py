@@ -52,37 +52,68 @@ def random_id(length):
     return new_id
 
 
-def mutate_id(id):
-    pos_to_mutate = random.randint(0, len(id) - 1)
-    chars_available_to_mutate_to = "+-*/%^L()xyn12"
+def get_chars_available_to_mutate_to(id, pos_to_mutate):
+
+    chars_available_to_mutate_to = characters
+    char_to_mutate = id[pos_to_mutate]
+
+    # In case pos to mutate is too close to the beginning or end of the id, '(' and ')' are not worth to mutate to.
+    # TODO: Remove '(' and ')' from chars to mutate to in case there is a ')' or '(' to close to the char respectively.
     if pos_to_mutate < 4 or (pos_to_mutate + 1 < len(id) and id[pos_to_mutate + 1] == '('):
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
     if pos_to_mutate + 4 > len(id) or id[pos_to_mutate + 1] == ')':
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
     operators = "+-*/%^L"
     variables_and_numbers = "xyn12"
-    char_to_mutate = id[pos_to_mutate]
-    suffix = ''
-    prefix = ''
+    chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
     if char_to_mutate in operators:
+        # In case we are going to mutate an operator, we might mutate TO an operator.
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
+        # If the next char to the operator is '-', means that it's a negation, not a subtraction.
         if pos_to_mutate + 1 < len(id) and id[pos_to_mutate + 1] == '-':
+            # In that case, we also restrict mutation to '-' and '+' operators, given they don't fit well with negation.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
-        if char_to_mutate == '-' and (pos_to_mutate == 0 or id[pos_to_mutate - 1] == '(' or id[pos_to_mutate - 1] in operators):
-            prefix = variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
     elif char_to_mutate in variables_and_numbers or char_to_mutate == '(':
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "")
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
-    if char_to_mutate == '(' and id[pos_to_mutate + 1] != '-':
-        suffix = operators[random.randint(0, len(operators) - 1)]
-    elif char_to_mutate == ')':
+    if char_to_mutate == ')':
+        chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
-        suffix = variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
 
-    chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
-    char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
-    new_id = id[:pos_to_mutate] + prefix + char_to_mutate_to + suffix + id[pos_to_mutate + 1:]
+    return chars_available_to_mutate_to
+
+
+def get_chars_to_mutate_to(id, pos_to_mutate, chars_available_to_mutate_to):
+
+    operators = "+-*/%^L"
+    char_to_mutate = id[pos_to_mutate]
+    chars_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
+    # In case char to mutate is a negation...
+    prev_char = id[pos_to_mutate - 1]
+    if char_to_mutate == '-' and (pos_to_mutate == 0 or prev_char in operators or prev_char == '('):
+        if chars_to_mutate_to in operators:
+            remove_char_or_add_variable_to_the_left = random_bool()
+            if remove_char_or_add_variable_to_the_left:
+                chars_to_mutate_to = ''
+            else:
+                pass
+    return chars_to_mutate_to
+
+def random_bool() -> bool:
+    return bool(random.getrandbits(1))
+
+
+def mutate_id(id):
+
+    pos_to_mutate = random.randint(0, len(id) - 1)
+    suffix = ''
+    prefix = ''
+    variables_and_numbers = "xyn12"
+    chars_available_to_mutate_to = get_chars_available_to_mutate_to(id, pos_to_mutate)
+    chars_to_mutate_to = get_chars_to_mutate_to(id, pos_to_mutate, chars_available_to_mutate_to)
+
+    new_id = id[:pos_to_mutate] + chars_to_mutate_to + id[pos_to_mutate + 1:]
 
     if char_to_mutate == '(':
         close_parenthesis_positions = []

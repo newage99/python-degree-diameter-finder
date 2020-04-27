@@ -10,7 +10,8 @@ if __name__ == '__main__':
     for length in ids_lengths:
         for i in range(1, ids_per_length + 1):
             id = random_id(length)
-            print('Testing ' + str(number_of_mutation_per_id) + ' mutations on id #' + str(i) + ' (' + id + ') of length ' + str(length) + '...', end=" ")
+            print('Testing ' + str(number_of_mutation_per_id) + ' mutations on id #' + str(
+                i) + ' (' + id + ') of length ' + str(length) + '...', end=" ")
             for i in range(number_of_mutation_per_id):
                 mutated_id, pos, c, new_c = mutate_id(id)
                 mutated_id_len = len(mutated_id)
@@ -30,7 +31,7 @@ if __name__ == '__main__':
                         print(mutated_id)
                         print((' ' * j) + '^ char \'' + mutated_id[j] + '\' must not be ' + (
                             'preceded' if error == 'L' else 'followed') + ' by char \'' + mutated_id[
-                                  j + (1 if error == 'R' else -1)] + '\'')
+                                  j + (-1 if error == 'L' else 1)] + '\'')
                         exit(0)
                 if parenthesis_counter != 0:
                     print('')
