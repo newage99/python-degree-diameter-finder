@@ -56,4 +56,6 @@ forbidden_left_chars = {
     "8": array_left,
     "9": array_left
 }
-characters = "+-*/%^L()xyn12"
+operators = "+-*/%^L"
+characters = operators + "()xyn12"
+variables_and_numbers = characters.replace(operators, "").replace("()", "")

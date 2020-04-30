@@ -1,4 +1,4 @@
-from IdsManager import random_id, mutate_id
+from IdMutator import random_id, mutate_id
 from global_variables import *
 
 ids_lengths = [3, 5, 10, 25, 100]

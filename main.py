@@ -1,5 +1,5 @@
 from ExpressionInterpreter import ExpressionInterpreter
-from IdsManager import random_id, mutate_id
+from IdMutator import random_id, mutate_id
 
 if __name__ == '__main__':
     ei = ExpressionInterpreter()
