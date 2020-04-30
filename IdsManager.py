@@ -4,6 +4,8 @@ from global_variables import *
 
 id = ""
 n = 0
+operators = "+-*/%^L"
+variables_and_numbers = "xyn12"
 
 
 def random_bool() -> bool:
@@ -80,8 +82,6 @@ def is_not_worth_mutate_to_close_parenthesis(pos_to_mutate):
 # TODO: Implement test to this function.
 def get_chars_available_to_mutate_to(id, pos_to_mutate):
 
-    operators = "+-*/%^L"
-    variables_and_numbers = "xyn12"
     chars_available_to_mutate_to = characters
     char_to_mutate = id[pos_to_mutate]
     chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
@@ -97,10 +97,14 @@ def get_chars_available_to_mutate_to(id, pos_to_mutate):
             # In that case, we also restrict mutation to '-' and '+' operators, given they don't fit well with negation.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
-    # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
-    # is not worth to mutate to char ')'.
     elif char_to_mutate == '(' or is_not_worth_mutate_to_open_parenthesis(pos_to_mutate):
+        # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
+        # is not worth to mutate to char ')'.
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
+        # If char to mutate is '(' and it's located at the beginning of the id, placing an operator (except
+        # '-' one) there makes no sense. Examples: (n+1) -> /n+1), (n+1) -> *n+1)
+        if char_to_mutate == '(' and pos_to_mutate == 0:
+            chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "") + "-"
     # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
     # is not worth to mutate to char ')'.
     elif char_to_mutate == ')' or is_not_worth_mutate_to_close_parenthesis(pos_to_mutate):
@@ -109,33 +113,82 @@ def get_chars_available_to_mutate_to(id, pos_to_mutate):
     return chars_available_to_mutate_to
 
 
+def is_negation(id, pos):
+    return id[pos] == '-' and (pos == 0 or id[pos - 1] in operators or id[pos - 1] == '(')
+
+
+# Inserts a variable/number or an operator to the left or right of the value depending on the provided parameters
+def insert_char(value, insert_at_right_or_left, insert_var_or_operator):
+    char_to_insert = random_var_or_number() if insert_var_or_operator else random_operator()
+    return (value + char_to_insert) if insert_at_right_or_left else (char_to_insert + value)
+
+
+def random_var_or_number():
+    return variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
+
+
+def random_operator():
+    return operators[random.randint(0, len(operators) - 1)]
+
+
 def get_chars_to_mutate_to(id, pos_to_mutate, chars_available_to_mutate_to):
 
-    operators = "+-*/%^L"
-    variables_and_numbers = "xyn12"
     char_to_mutate = id[pos_to_mutate]
     chars_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
-    prev_char = id[pos_to_mutate - 1]
     # In case char to mutate is a negation...
-    if char_to_mutate == '-' and (pos_to_mutate == 0 or prev_char in operators or prev_char == '('):
+    if is_negation(id, pos_to_mutate):
         if chars_to_mutate_to in operators:
             id_len = len(id)
             if id_len < n:
                 # In case the length of the actual id is lesser than the wanted length,
                 # we insert a variable prev to the negation to convert it to a subtraction.
-                chars_to_mutate_to = variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
+                chars_to_mutate_to = random_var_or_number()
             elif id_len > n:
                 # In case the length of the actual id is bigger than the wanted length,
                 # we remove the char to remove the negation.
                 chars_to_mutate_to = ''
             else:
                 # Otherwise, we flip a coin to decide if we add a variable or remove the negation.
-                chars_to_mutate_to = '' if random_bool() else variables_and_numbers[
-                    random.randint(0, len(variables_and_numbers) - 1)]
+                chars_to_mutate_to = '' if random_bool() else random_var_or_number()
+    # In case char to mutate is an open parenthesis...
     elif char_to_mutate == '(':
-        pass  # TODO
+        prev_char = id[pos_to_mutate - 1] if pos_to_mutate > 0 else ''
+        next_char = id[pos_to_mutate + 1]
+        insert_at_right_or_left = chars_to_mutate_to in variables_and_numbers or (pos_to_mutate == 0 and id[1] == '-')
+        insert_var_or_operator = chars_to_mutate_to not in variables_and_numbers
+        not_able_to_remove_char = next_char == '-' and pos_to_mutate > 0 and prev_char == '+'
+
+        if (chars_to_mutate_to in variables_and_numbers and (
+                next_char != '-' or (pos_to_mutate == 0 and id[1] != '('))) or (chars_to_mutate_to in operators and (
+                next_char == '-' or (pos_to_mutate > 0 and prev_char in operators))):
+            len_id = len(id)
+            # This means id length will be 1 or more positions smaller than the wanted length 'n' (because an ')' char
+            # will be later removed from the id).
+            if len_id <= n:
+                # Given we want the id length to be equal to the wanted length 'n',
+                # we add a char to the chars_to_mutate_to string
+                chars_to_mutate_to = insert_char(chars_to_mutate_to, insert_at_right_or_left, insert_var_or_operator)
+            # This means the id length will be equal to the wanted length 'n' after we remove an ')' char.
+            elif len_id == n+1:
+                # In that case, we flip a coin to decide if we add a char to the chars_to_mutate_to string or
+                # we don't insert any char at all.
+                if random_bool():
+                    chars_to_mutate_to = insert_char(chars_to_mutate_to, insert_at_right_or_left, insert_var_or_operator)
+                else:
+                    chars_to_mutate_to = random_var_or_number() if not_able_to_remove_char else ''
+            # The only cases left to consider are the ones where the id length is 2 or more chars bigger than
+            # the wanted length 'n'. In that case, for sure we don't insert any char at all.
+            else:
+                chars_to_mutate_to = random_var_or_number() if not_able_to_remove_char else ''
+    # In case char to mutate is an close parenthesis...
     elif char_to_mutate == ')':
         pass  # TODO
+
+    if chars_to_mutate_to == '(':
+        pass  # TODO
+    elif chars_to_mutate_to == ')':
+        pass  # TODO
+
     return chars_to_mutate_to
 
 
@@ -177,7 +230,7 @@ def mutate_id_inner():
             new_id = new_id[:pos_to_mutate_plus_one] + new_id[pos_to_mutate_plus_one + 1:]
         pos_to_mutate_minus_one = pos_to_mutate - 1
         if pos_to_mutate_minus_one >= 0 and new_id[pos_to_mutate_minus_one] in variables_and_numbers:
-            new_id = new_id[:pos_to_mutate] + operators[random.randint(0, len(operators) - 1)] + new_id[pos_to_mutate:]
+            new_id = new_id[:pos_to_mutate] + random_operator() + new_id[pos_to_mutate:]
         valid_positions_to_close = []
         pos = pos_to_mutate + 4
         while pos < len(new_id):
