@@ -144,13 +144,7 @@ class IdMutator(unittest.TestCase):
         char_to_mutate = self.id[self.pos_to_mutate]
         chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
 
-        if char_to_mutate in variables_and_numbers:
-            # In case we are going to mutate a variable or a number, we might mutate TO a variable or number.
-            chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "")
-        elif char_to_mutate in operators or char_to_mutate == ')':
-            # In case we are going to mutate an operator, we might mutate TO an operator.
-            chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
-        elif char_to_mutate == '(' or IdMutator.__is_not_worth_mutate_to_open_parenthesis(self.pos_to_mutate):
+        if char_to_mutate == '(' or self.__is_not_worth_mutate_to_close_parenthesis():
             # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
             # is not worth to mutate to char ')'.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
@@ -161,8 +155,15 @@ class IdMutator(unittest.TestCase):
                 chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "") + "-"
         # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
         # is not worth to mutate to char ')'.
-        elif char_to_mutate == ')' or IdMutator.__is_not_worth_mutate_to_close_parenthesis(self.pos_to_mutate):
+        if char_to_mutate == ')' or self.__is_not_worth_mutate_to_open_parenthesis():
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
+        if char_to_mutate in variables_and_numbers:
+            # In case we are going to mutate a variable or a number, we might mutate TO a variable, a number or
+            # a parenthesis.
+            chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "")
+        elif char_to_mutate in operators:
+            # In case we are going to mutate an operator, we might mutate TO an operator or a parenthesis.
+            chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
 
         # If next char is '-', means that replacing to '+' or '-' would create a wrong expressions '+-' and '--'.
         if self.pos_to_mutate + 1 < len(self.id) and self.id[self.pos_to_mutate + 1] == '-':
@@ -178,9 +179,10 @@ class IdMutator(unittest.TestCase):
         suffix = ''
         prev_char = self.id[self.pos_to_mutate - 1] if self.pos_to_mutate > 0 else ''
         next_char = self.id[self.pos_to_mutate + 1] if self.pos_to_mutate + 1 < len(self.id) else ''
+        char_to_mutate_is_negation = IdMutator.__is_negation(self.id, self.pos_to_mutate)
 
         # In case char to mutate is a negation...
-        if IdMutator.__is_negation(self.id, self.pos_to_mutate):
+        if char_to_mutate_is_negation:
             if char_to_mutate_to in operators:
                 id_len = len(self.id)
                 # In case the length of the actual id is lesser than the wanted length,
@@ -232,12 +234,14 @@ class IdMutator(unittest.TestCase):
         if char_to_mutate_to == '(':
             if self.char_to_mutate in variables_and_numbers and next_char in operators.replace("-", ""):
                 suffix = random_var_or_number()
-            elif self.char_to_mutate in operators and prev_char in variables_and_numbers and next_char != '-':
+            elif self.char_to_mutate in operators and (prev_char == ')' or prev_char in variables_and_numbers):
                 prefix = random_operator()
         elif char_to_mutate_to == ')':
             if prev_char in operators:
                 prefix = random_var_or_number()
-            elif prev_char in variables_and_numbers and next_char != '-':
+                if next_char in variables_and_numbers or next_char == '(':
+                    suffix = random_operator()
+            elif (prev_char in variables_and_numbers and next_char != '-') or (prev_char == ')' and next_char != '-'):
                 suffix = random_operator()
 
         return prefix, char_to_mutate_to, suffix
@@ -250,6 +254,7 @@ class IdMutator(unittest.TestCase):
         self.pos_to_mutate = random.randint(0, len(self.id) - 1)
         self.char_to_mutate = self.id[self.pos_to_mutate]
 
-    def mutate_id(self, id_to_mutate, wanted_length):
+    def mutate_id(self, id_to_mutate, wanted_length=None):
+        wanted_length = wanted_length if wanted_length else len(id_to_mutate)
         self.set_id_and_wanted_length(id_to_mutate, wanted_length)
         self.__mutate_id()
