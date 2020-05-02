@@ -4,7 +4,7 @@ from IdMutator import IdMutator
 
 if __name__ == '__main__':
     ei = ExpressionInterpreter()
-    result = ei.compute("21^405")
+    result = ei.compute("(-3)")
     x = 0
     r = IdGenerator.generate_id(12)
     print(r)
