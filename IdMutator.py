@@ -21,7 +21,7 @@ class IdMutator(unittest.TestCase):
 
     # Inserts a variable/number or an operator to the left or right of the value depending on the provided parameters
     @staticmethod
-    def __set_variable_or_operator_to_suffix_or_prefix(var_or_operator, suffix_or_prefix):
+    def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
         char_to_set = random_var_or_number() if var_or_operator else random_operator()
         return ('', char_to_set) if suffix_or_prefix else (char_to_set, '')
 
@@ -150,25 +150,24 @@ class IdMutator(unittest.TestCase):
         elif char_to_mutate in operators or char_to_mutate == ')':
             # In case we are going to mutate an operator, we might mutate TO an operator.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace(variables_and_numbers, "")
-            # If the next char to the operator is '-', means that it's a negation, not a subtraction.
-            if char_to_mutate != ')' and self.pos_to_mutate + 1 < len(self.id) and \
-                    self.id[self.pos_to_mutate + 1] == '-':
-                # In that case, we also restrict mutation to '-' and '+' operators,
-                # given they don't fit well with negation.
-                chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
-                chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
         elif char_to_mutate == '(' or IdMutator.__is_not_worth_mutate_to_open_parenthesis(self.pos_to_mutate):
             # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
             # is not worth to mutate to char ')'.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
-            # If char to mutate is '(' and it's located at the beginning of the id, placing an operator (except
-            # '-' one) there makes no sense. Examples: (n+1) -> /n+1), (n+1) -> *n+1)
+            # If char to mutate is '('...
             if char_to_mutate == '(' and self.pos_to_mutate == 0:
+                # and it's located at the beginning of the id, placing an operator (except
+                # '-' one) there makes no sense. Examples: (n+1) -> /n+1), (n+1) -> *n+1)
                 chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operators, "") + "-"
         # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
         # is not worth to mutate to char ')'.
         elif char_to_mutate == ')' or IdMutator.__is_not_worth_mutate_to_close_parenthesis(self.pos_to_mutate):
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
+
+        # If next char is '-', means that replacing to '+' or '-' would create a wrong expressions '+-' and '--'.
+        if self.pos_to_mutate + 1 < len(self.id) and self.id[self.pos_to_mutate + 1] == '-':
+            chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
+            chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
 
         return chars_available_to_mutate_to
 
@@ -196,27 +195,21 @@ class IdMutator(unittest.TestCase):
                     prefix = random_var_or_number()
         # In case char to mutate is an open parenthesis...
         elif self.char_to_mutate == '(':
-            suffix_or_prefix = char_to_mutate_to in variables_and_numbers or (
-                        self.pos_to_mutate == 0 and self.id[1] == '-')
-            var_or_operator = char_to_mutate_to not in variables_and_numbers
+            suffix_or_prefix = char_to_mutate_to in variables_and_numbers
+            var_or_operator = char_to_mutate_to in operators
             not_able_to_remove_char = next_char == '-' and self.pos_to_mutate > 0 and prev_char == '+'
-
-            if (char_to_mutate_to in variables_and_numbers and (
-                    next_char != '-' or (self.pos_to_mutate == 0 and self.id[1] != '('))) or (
-                    char_to_mutate_to in operators and (
-                    next_char == '-' or (self.pos_to_mutate > 0 and prev_char in operators))):
+            if (char_to_mutate_to in variables_and_numbers and next_char != '-') or (
+                    char_to_mutate_to in operators and (self.pos_to_mutate > 0 or next_char == '-')):
                 len_id = len(self.id)
-                # LINE 1 CONDITIONAL: This means id length will be 1 or more positions smaller than the wanted length
+                # FIRST CONDITIONAL: This means id length will be 1 or more positions smaller than the wanted length
                 # (because an ')' char will be later removed from the id).
-                # LINE 2 CONDITIONAL: This means the id length will be equal to the wanted length after we remove an
+                # SECOND CONDITIONAL: This means the id length will be equal to the wanted length after we remove an
                 # ')' char. In negative case, we flip a coin to decide if we add a char to the chars_to_mutate_to
                 # string or we don't insert any char at all.
-                if len_id <= self.wanted_length or \
-                        (len_id == self.wanted_length+1 and random_bool()):
+                if len_id <= self.wanted_length or (len_id == self.wanted_length+1 and random_bool()):
                     # Given we want the id length to be equal to the wanted length,
                     # we add a char either to the prefix or suffix
-                    prefix, suffix = IdMutator.__set_variable_or_operator_to_suffix_or_prefix(var_or_operator,
-                                                                                              suffix_or_prefix)
+                    prefix, suffix = IdMutator.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
                 # The only cases left to consider are the ones where the id length is 2 or more chars bigger than
                 # the wanted length. In that case, for sure we don't insert any char at all.
                 # If we don't insert any char at all, on ids where the char to mutate is surrounded by an '+'
@@ -227,7 +220,14 @@ class IdMutator(unittest.TestCase):
                     char_to_mutate_to = random_var_or_number() if not_able_to_remove_char else ''
         # In case char to mutate is an close parenthesis...
         elif self.char_to_mutate == ')':
-            pass  # TODO
+            suffix_or_prefix = char_to_mutate_to in operators
+            var_or_operator = char_to_mutate_to in operators
+            if char_to_mutate_to in variables_and_numbers or (char_to_mutate_to in operators and next_char != '-'):
+                len_id = len(self.id)
+                if len_id <= self.wanted_length or (len_id == self.wanted_length+1 and random_bool()):
+                    prefix, suffix = IdMutator.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
+                else:
+                    char_to_mutate_to = ''
 
         if char_to_mutate_to == '(':
             if self.char_to_mutate in variables_and_numbers and next_char in operators.replace("-", ""):
@@ -235,7 +235,10 @@ class IdMutator(unittest.TestCase):
             elif self.char_to_mutate in operators and prev_char in variables_and_numbers and next_char != '-':
                 prefix = random_operator()
         elif char_to_mutate_to == ')':
-            pass  # TODO
+            if prev_char in operators:
+                prefix = random_var_or_number()
+            elif prev_char in variables_and_numbers and next_char != '-':
+                suffix = random_operator()
 
         return prefix, char_to_mutate_to, suffix
 
