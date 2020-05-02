@@ -177,6 +177,8 @@ class IdMutator(unittest.TestCase):
 
         prefix = ''
         suffix = ''
+        prev_char = self.id[self.pos_to_mutate - 1] if self.pos_to_mutate > 0 else ''
+        next_char = self.id[self.pos_to_mutate + 1] if self.pos_to_mutate + 1 < len(self.id) else ''
 
         # In case char to mutate is a negation...
         if IdMutator.__is_negation(self.id, self.pos_to_mutate):
@@ -194,8 +196,6 @@ class IdMutator(unittest.TestCase):
                     prefix = random_var_or_number()
         # In case char to mutate is an open parenthesis...
         elif self.char_to_mutate == '(':
-            prev_char = self.id[self.pos_to_mutate - 1] if self.pos_to_mutate > 0 else ''
-            next_char = self.id[self.pos_to_mutate + 1]
             suffix_or_prefix = char_to_mutate_to in variables_and_numbers or (
                         self.pos_to_mutate == 0 and self.id[1] == '-')
             var_or_operator = char_to_mutate_to not in variables_and_numbers
@@ -230,8 +230,10 @@ class IdMutator(unittest.TestCase):
             pass  # TODO
 
         if char_to_mutate_to == '(':
-            pass  # TODO
-
+            if self.char_to_mutate in variables_and_numbers and next_char in operators.replace("-", ""):
+                suffix = random_var_or_number()
+            elif self.char_to_mutate in operators and prev_char in variables_and_numbers and next_char != '-':
+                prefix = random_operator()
         elif char_to_mutate_to == ')':
             pass  # TODO
 
