@@ -57,82 +57,66 @@ class IdMutator(unittest.TestCase):
                 pos -= 1
         return False
 
-    def __mutate_id(self):
+    def __insert_open_parenthesis_until_pos(self, pos):
+        positions_to_insert_open_parenthesis = []
+        while pos >= 0:
+            prev_char = self.id[pos - 1] if pos > 0 else ''
+            if self.id[pos] == ')':
+                pos -= 3
+            elif (prev_char in (operators + "(") or prev_char == '') and self.id[pos] in (variables_and_numbers + "("):
+                positions_to_insert_open_parenthesis.append(pos)
+            pos -= 1
+        there_are_positions_to_insert_open_parenthesis = len(positions_to_insert_open_parenthesis) > 0
+        if there_are_positions_to_insert_open_parenthesis:
+            pos = positions_to_insert_open_parenthesis[random.randint(0, len(positions_to_insert_open_parenthesis) - 1)]
+            self.id = self.id[:pos] + "(" + self.id[pos:]
+        return there_are_positions_to_insert_open_parenthesis
 
+    def __insert_close_parenthesis_from_pos(self, pos):
+        positions_to_insert_close_parenthesis = []
+        len_id = len(self.id)
+        while pos < len_id:
+            prev_char = self.id[pos - 1] if pos > 0 else ''
+            if self.id[pos] == '(':
+                pos += 3
+            elif prev_char in (variables_and_numbers + ")") and self.id[pos] in (operators + ")"):
+                positions_to_insert_close_parenthesis.append(pos)
+            pos += 1
+        positions_to_insert_close_parenthesis.append(len_id)
+        pos = positions_to_insert_close_parenthesis[random.randint(0, len(positions_to_insert_close_parenthesis) - 1)]
+        if pos == len_id:
+            self.id += ")"
+        else:
+            self.id = self.id[:pos] + ")" + self.id[pos:]
+
+    def __add_parenthesis_if_needed(self):
+        parenthesis_inserted = True
+        while parenthesis_inserted:
+            parenthesis_inserted = False
+            parenthesis_counter = 0
+            for i in range(len(self.id)):
+                char = self.id[i]
+                if char == '(':
+                    parenthesis_counter += 1
+                elif char == ')':
+                    if parenthesis_counter == 0:
+                        self.__insert_open_parenthesis_until_pos(i - 3)
+                        parenthesis_inserted = True
+                        break
+                    parenthesis_counter -= 1
+            # This means there has been one or more open parenthesis not closed.
+            if not parenthesis_inserted and parenthesis_counter > 0:
+                self.__insert_close_parenthesis_from_pos(self.id.rfind('(') + 4)
+                parenthesis_inserted = True
+
+    def __mutate_id(self):
         self.calculate_pos_to_mutate()
         chars_available_to_mutate_to = self.get_chars_available_to_mutate_to()
         char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
         prefix, char_to_mutate_to, suffix = self.clean_char_to_mutate_to(char_to_mutate_to)
-
-        new_id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
-
-        # TODO: Remove code below and only implement inserting open or close parenthesis if it's needed.
-
-        if char_to_mutate == '(':
-            close_parenthesis_positions = []
-            pos = pos_to_mutate + 3
-            while pos < len(new_id):
-                if new_id[pos] == ')':
-                    close_parenthesis_positions.append(pos)
-                pos += 1
-            pos_to_remove_close = close_parenthesis_positions[random.randint(0, len(close_parenthesis_positions) - 1)]
-            new_id = new_id[:pos_to_remove_close] + new_id[pos_to_remove_close + 1:]
-        elif char_to_mutate == ')':
-            if pos_to_mutate + 1 == len(new_id) and char_to_mutate_to in operators:
-                new_id += variables_and_numbers[random.randint(0, len(variables_and_numbers) - 1)]
-            open_parenthesis_positions = []
-            pos = pos_to_mutate - 3
-            while pos >= 0:
-                if new_id[pos] == '(':
-                    open_parenthesis_positions.append(pos)
-                pos -= 1
-            pos_to_remove_open = open_parenthesis_positions[random.randint(0, len(open_parenthesis_positions) - 1)]
-            new_id = new_id[:pos_to_remove_open] + new_id[pos_to_remove_open + 1:]
-
-        if char_to_mutate_to == '(':
-            pos_to_mutate_plus_one = pos_to_mutate + 1
-            if new_id[pos_to_mutate_plus_one] in operators and new_id[pos_to_mutate_plus_one] != '-':
-                new_id = new_id[:pos_to_mutate_plus_one] + new_id[pos_to_mutate_plus_one + 1:]
-            pos_to_mutate_minus_one = pos_to_mutate - 1
-            if pos_to_mutate_minus_one >= 0 and new_id[pos_to_mutate_minus_one] in variables_and_numbers:
-                new_id = new_id[:pos_to_mutate] + random_operator() + new_id[pos_to_mutate:]
-            valid_positions_to_close = []
-            pos = pos_to_mutate + 4
-            while pos < len(new_id):
-                if new_id[pos] in operators and (not (new_id[pos - 1] in operators)) and new_id[pos - 1] != '(':
-                    valid_positions_to_close.append(pos)
-                pos += 1
-            if len(valid_positions_to_close) <= 0:
-                new_id += ")"
-            else:
-                pos_to_close = valid_positions_to_close[random.randint(0, len(valid_positions_to_close) - 1)]
-                new_id = new_id[:pos_to_close] + ")" + new_id[pos_to_close:]
-        elif char_to_mutate_to == ')':
-            pos_to_mutate_plus_one = pos_to_mutate + 1
-            if pos_to_mutate_plus_one < len(new_id) and (new_id[pos_to_mutate_plus_one] in variables_and_numbers or new_id[pos_to_mutate_plus_one] == '('):
-                new_id = new_id[:pos_to_mutate_plus_one] + operators[random.randint(0, len(operators) - 1)] + new_id[pos_to_mutate_plus_one:]
-            if char_to_mutate == '-' and new_id[pos_to_mutate - 1] in operators:
-                new_id = new_id[:pos_to_mutate - 1] + new_id[pos_to_mutate:]
-            valid_positions_to_insert_open = []
-            pos = pos_to_mutate - 3
-            while pos >= 0:
-                if new_id[pos] in variables_and_numbers or new_id[pos] == '(':
-                    valid_positions_to_insert_open.append(pos)
-                pos -= 1
-            if len(valid_positions_to_insert_open) <= 0:
-                new_id = '(' + new_id
-            else:
-                pos_to_insert_open = valid_positions_to_insert_open[random.randint(0, len(valid_positions_to_insert_open) - 1)]
-                new_id = new_id[:pos_to_insert_open] + '(' + new_id[pos_to_insert_open:]
-
-        if ")(" in new_id:
-            pos = new_id.index(")(")
-            new_id = new_id[:pos + 1] + operators[random.randint(0, len(operators) - 1)] + new_id[pos + 1:]
-
-        new_id = new_id.replace("+-", "-")
-        new_id = new_id.replace("--", "+")
-
-        return new_id, pos_to_mutate, char_to_mutate, char_to_mutate_to
+        self.id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
+        self.__add_parenthesis_if_needed()
+        return self.id, self.pos_to_mutate, self.char_to_mutate, char_to_mutate_to
 
     # -------------------- #
     # -- PUBLIC METHODS -- #
@@ -172,7 +156,6 @@ class IdMutator(unittest.TestCase):
 
         return chars_available_to_mutate_to
 
-    # TODO: Implement test to this function.
     def clean_char_to_mutate_to(self, char_to_mutate_to):
 
         prefix = ''
@@ -239,9 +222,10 @@ class IdMutator(unittest.TestCase):
         elif char_to_mutate_to == ')':
             if prev_char in operators:
                 prefix = random_var_or_number()
-                if next_char in variables_and_numbers or next_char == '(':
+                if next_char != '' and (next_char in variables_and_numbers or next_char == '('):
                     suffix = random_operator()
-            elif (prev_char in variables_and_numbers and next_char != '-') or (prev_char == ')' and next_char != '-'):
+            elif next_char != '' and ((prev_char in variables_and_numbers and next_char != '-') or (
+                    prev_char == ')' and next_char != '-')):
                 suffix = random_operator()
 
         return prefix, char_to_mutate_to, suffix
@@ -257,4 +241,4 @@ class IdMutator(unittest.TestCase):
     def mutate_id(self, id_to_mutate, wanted_length=None):
         wanted_length = wanted_length if wanted_length else len(id_to_mutate)
         self.set_id_and_wanted_length(id_to_mutate, wanted_length)
-        self.__mutate_id()
+        return self.__mutate_id()
