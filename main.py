@@ -1,6 +1,6 @@
-from ExpressionInterpreter import ExpressionInterpreter
-from IdGenerator import IdGenerator
-from IdMutator import IdMutator
+from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
+from id_manager.IdGenerator import IdGenerator
+from id_manager.IdMutator import IdMutator
 
 if __name__ == '__main__':
     ei = ExpressionInterpreter()

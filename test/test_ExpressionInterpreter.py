@@ -1,5 +1,5 @@
 import unittest
-from ExpressionInterpreter import ExpressionInterpreter
+from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
 
 
 class ExpressionInterpreterTest(unittest.TestCase):
@@ -22,6 +22,13 @@ class ExpressionInterpreterTest(unittest.TestCase):
         # NEGATION WHEN NEXT CHAR IS OPEN PARENTHESIS
         self.assertEqual(ExpressionInterpreter.process_negations("3+4*-(2%4)+3"), "3+4*(0-(2%4))+3")
         self.assertEqual(ExpressionInterpreter.process_negations("3L-((456-44)/3)+(24*7)"), "3L(0-((456-44)/3))+(24*7)")
+
+    def test_compute(self):
+
+        ei = ExpressionInterpreter()
+        self.assertEqual(ei.compute("2^3-1"), 7)
+        self.assertEqual(ei.compute("2L8"), 3)
+        self.assertEqual(ei.compute("2-((5%2+1)^4-3)"), -11)
 
 
 if __name__ == "__main__":

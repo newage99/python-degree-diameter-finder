@@ -1,5 +1,3 @@
-from global_variables import *
-from IdGenerator import IdGenerator
 from Random import *
 import unittest
 

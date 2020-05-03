@@ -1,7 +1,7 @@
 import unittest
-from IdGenerator import IdGenerator
+from id_manager.IdGenerator import IdGenerator
 import random
-from IdMutator import IdMutator
+from id_manager.IdMutator import IdMutator
 from global_variables import *
 
 

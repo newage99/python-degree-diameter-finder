@@ -1,5 +1,5 @@
-from Symbol import Symbol
-from Result import Result
+from expression_interpreter.Symbol import Symbol
+from expression_interpreter.Result import Result
 from math import log, pow
 import unittest
 from global_variables import operators
@@ -34,7 +34,6 @@ class ExpressionInterpreter(unittest.TestCase):
         return b + a
 
     def __subtraction(self, a, b):
-        # TODO: Consider negation!
         a, b = self.__limits(a, b, bottom_result=0)
         return b - a
 
@@ -61,9 +60,9 @@ class ExpressionInterpreter(unittest.TestCase):
 
     def __logarithm(self, a, b):
         incorrect_input = a == 0
-        a = self.__limit(a, 100, 2, 100, 2)
-        b = self.__limit(b)
-        return log(b, a), incorrect_input
+        a, limit_reached = self.__limit(a, 100, 2, 100, 2)
+        b, limit_reached = self.__limit(b)
+        return log(a, b), incorrect_input
 
     def __pop(self):
         return self.numbers[-1].pop()
@@ -88,7 +87,6 @@ class ExpressionInterpreter(unittest.TestCase):
             return
         count = self.__count()
         if count > 1:
-            # operation = self.__operation_pop()
             operation = self.operations.pop()
             if operation == Symbol.Addition:
                 self.__push(self.__addition(self.__pop(), self.__pop()))
