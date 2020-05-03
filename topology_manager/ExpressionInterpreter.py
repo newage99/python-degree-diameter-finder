@@ -1,5 +1,5 @@
-from expression_interpreter.Symbol import Symbol
-from expression_interpreter.Result import Result
+from topology_manager.Symbol import Symbol
+from topology_manager.Result import Result
 from math import log, pow
 import unittest
 from global_variables import operators

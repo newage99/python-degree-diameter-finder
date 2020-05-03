@@ -1,5 +1,5 @@
 import unittest
-from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
+from topology_manager.ExpressionInterpreter import ExpressionInterpreter
 
 
 class ExpressionInterpreterTest(unittest.TestCase):
