@@ -1,3 +1,0 @@
-
-class TopologyManager:
-    pass

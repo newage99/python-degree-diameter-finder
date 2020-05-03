@@ -151,40 +151,7 @@ class ExpressionInterpreter(unittest.TestCase):
     def __limits(self, a, b, bottom_result=0.00000000001):
         return self.__limit(a, bottom_result=bottom_result)[0], self.__limit(b, bottom_result=bottom_result)[0]
 
-    @staticmethod
-    def process_negations(expression):
-        expression_modified = True
-        while expression_modified:
-            expression_modified = False
-            for i in range(len(expression)):
-                if expression[i] == '-' and (i == 0 or expression[i-1] in (operators + "(").replace("+", "")):
-                    final_suffix = expression[i+1:]
-                    if i > 0:
-                        parenthesis_counter = 0
-                        close_parenthesis_not_added = True
-                        for j in range(len(final_suffix)):
-                            if final_suffix[j] == '(':
-                                parenthesis_counter += 1
-                            elif (parenthesis_counter == 0 or (parenthesis_counter == 1 and final_suffix[j] == ')')) \
-                                    and (j+1 == len(final_suffix) or not final_suffix[j:j+2].isdigit()):
-                                final_suffix = final_suffix[:j+1] + ")" + final_suffix[j+1:]
-                                close_parenthesis_not_added = False
-                                break
-                            elif final_suffix[j] == ')':
-                                parenthesis_counter -= 1
-                        if close_parenthesis_not_added:
-                            final_suffix += ")"
-                    expression = expression[:i] + ("(" if i > 0 else "") + "0-" + final_suffix
-                    expression_modified = True
-                    break
-        return expression
-
-    # -------------------- #
-    # -- PUBLIC METHODS -- #
-    # -------------------- #
-
-    def compute(self, expression: str):
-
+    def __compute(self, expression):
         self.expression = ExpressionInterpreter.process_negations(expression)
         self.numbers = []
         self.numbers.append([])
@@ -209,3 +176,40 @@ class ExpressionInterpreter(unittest.TestCase):
         except Exception as e:
             return 0
         return self.numbers[0][0]
+
+    # --------------------------- #
+    # -- STATIC PUBLIC METHODS -- #
+    # --------------------------- #
+
+    @staticmethod
+    def process_negations(expression):
+        expression_modified = True
+        while expression_modified:
+            expression_modified = False
+            for i in range(len(expression)):
+                if expression[i] == '-' and (i == 0 or expression[i - 1] in (operators + "(").replace("+", "")):
+                    final_suffix = expression[i + 1:]
+                    if i > 0:
+                        parenthesis_counter = 0
+                        close_parenthesis_not_added = True
+                        for j in range(len(final_suffix)):
+                            if final_suffix[j] == '(':
+                                parenthesis_counter += 1
+                            elif (parenthesis_counter == 0 or (parenthesis_counter == 1 and final_suffix[j] == ')')) \
+                                    and (j + 1 == len(final_suffix) or not final_suffix[j:j + 2].isdigit()):
+                                final_suffix = final_suffix[:j + 1] + ")" + final_suffix[j + 1:]
+                                close_parenthesis_not_added = False
+                                break
+                            elif final_suffix[j] == ')':
+                                parenthesis_counter -= 1
+                        if close_parenthesis_not_added:
+                            final_suffix += ")"
+                    expression = expression[:i] + ("(" if i > 0 else "") + "0-" + final_suffix
+                    expression_modified = True
+                    break
+        return expression
+
+    @staticmethod
+    def compute(expression: str):
+        ei = ExpressionInterpreter()
+        return ei.__compute(expression)
