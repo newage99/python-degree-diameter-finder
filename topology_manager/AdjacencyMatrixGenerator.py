@@ -26,7 +26,7 @@ class AdjacencyMatrixGenerator:
         return number_of_components == 1 and first_component_length == n
 
     @staticmethod
-    def compute(id, n):
+    def generate_and_get_if_its_connected(id, n):
         matrix = []
         str_n = str(n)
         for x in range(0, n):
@@ -43,4 +43,5 @@ class AdjacencyMatrixGenerator:
 
 
 if __name__ == '__main__':
-    AdjacencyMatrixGenerator.compute(IdGenerator.generate_id(20), 5)
+    # Way to easily debug function
+    AdjacencyMatrixGenerator.generate_and_get_if_its_connected(IdGenerator.generate_id(20), 5)
