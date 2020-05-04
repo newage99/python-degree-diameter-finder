@@ -178,7 +178,7 @@ class ExpressionInterpreter(unittest.TestCase):
         return self.numbers[0][0]
 
     # --------------------------- #
-    # -- STATIC PUBLIC METHODS -- #
+    # -- PUBLIC STATIC METHODS -- #
     # --------------------------- #
 
     @staticmethod
