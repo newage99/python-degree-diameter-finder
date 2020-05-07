@@ -10,10 +10,6 @@ class DegreeAndDiameterCalculator:
         len_matrix = len(matrix)
         diameter = 0
         while to_visit_counter < len(to_visit) < len_matrix:
-            if to_visit_counter >= len(to_visit):
-                a = 0  # TODO: Testing purposes
-            if to_visit[to_visit_counter] >= len(matrix):
-                a = 0  # TODO: Testing purposes
             actual_node_neighbours = matrix[to_visit[to_visit_counter]]
             nodes_to_check = []
             for i in range(0, len(actual_node_neighbours)):

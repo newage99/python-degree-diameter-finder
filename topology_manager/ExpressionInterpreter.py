@@ -2,7 +2,7 @@ from topology_manager.Symbol import Symbol
 from topology_manager.Result import Result
 from math import log, pow
 import unittest
-from global_variables import operators
+from misc.global_variables import operators
 
 
 class ExpressionInterpreter(unittest.TestCase):

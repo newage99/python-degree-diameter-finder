@@ -1,4 +1,4 @@
-from Random import *
+from misc.Random import *
 import unittest
 
 

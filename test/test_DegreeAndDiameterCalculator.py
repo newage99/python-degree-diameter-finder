@@ -1,5 +1,5 @@
 import unittest
-from metrics_calculator.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
+from genetic_algorithm_manager.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 
 
 class DegreeAndDiameterCalculatorTest(unittest.TestCase):

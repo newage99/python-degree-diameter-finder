@@ -1,5 +1,5 @@
 import random
-from global_variables import *
+from misc.global_variables import *
 
 
 def random_bool() -> bool:

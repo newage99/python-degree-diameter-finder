@@ -1,5 +1,4 @@
-from global_variables import *
-from Random import *
+from misc.Random import *
 
 
 class IdGenerator:

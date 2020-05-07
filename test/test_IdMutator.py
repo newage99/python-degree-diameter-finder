@@ -2,7 +2,7 @@ import unittest
 from id_manager.IdGenerator import IdGenerator
 import random
 from id_manager.IdMutator import IdMutator
-from global_variables import *
+from misc.global_variables import *
 
 
 class IdMutatorTest(unittest.TestCase):
