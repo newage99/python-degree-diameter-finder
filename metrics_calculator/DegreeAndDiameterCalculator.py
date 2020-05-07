@@ -10,6 +10,10 @@ class DegreeAndDiameterCalculator:
         len_matrix = len(matrix)
         diameter = 0
         while to_visit_counter < len(to_visit) < len_matrix:
+            if to_visit_counter >= len(to_visit):
+                a = 0  # TODO: Testing purposes
+            if to_visit[to_visit_counter] >= len(matrix):
+                a = 0  # TODO: Testing purposes
             actual_node_neighbours = matrix[to_visit[to_visit_counter]]
             nodes_to_check = []
             for i in range(0, len(actual_node_neighbours)):
@@ -38,15 +42,15 @@ class DegreeAndDiameterCalculator:
         total_degree = 0
         total_diameter = 0
 
-        for x in range(0, len_matrix):
+        for x in range(0, len_matrix - 1):
             for y in range(x+1, len_matrix):
                 actual_degree = (number_of_neighbours[x] + number_of_neighbours[y]) / 2
                 actual_diameter = DegreeAndDiameterCalculator.shortest_path_length_between_two_nodes(matrix, x, y)
                 if actual_diameter == -1:
                     # This means dijkstra has not found a path between the two nodes, so the matrix is not connected.
-                    return [-1, -1, -1, -1]
-                total_degree += degree
-                total_diameter += diameter
+                    return None
+                total_degree += actual_degree
+                total_diameter += actual_diameter
                 if actual_degree > degree:
                     degree = actual_degree
                 if actual_diameter > diameter:

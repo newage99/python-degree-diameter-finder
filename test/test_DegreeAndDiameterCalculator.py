@@ -4,7 +4,7 @@ from metrics_calculator.DegreeAndDiameterCalculator import DegreeAndDiameterCalc
 
 class DegreeAndDiameterCalculatorTest(unittest.TestCase):
 
-    calculate = DegreeAndDiameterCalculator.calculate
+    # calculate = DegreeAndDiameterCalculator.calculate
 
     # Custom matrix in order to better test the functions:
     #
@@ -16,14 +16,15 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
     #
     custom = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [1, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 0, 0, 0],
               [0, 0, 1, 0, 1, 0, 0, 1, 0, 0], [0, 0, 0, 1, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 1, 1], [1, 0, 0, 0, 0, 0, 0, 1, 0, 0]]
+              [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 1, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+              [1, 0, 0, 0, 0, 0, 0, 1, 0, 0]]
 
     custom_distance_1_pairs = [[0, 1], [0, 9], [1, 2], [2, 3], [2, 5], [3, 4], [3, 7], [4, 5], [4, 6], [7, 8], [7, 9]]
-    custom_distance_2_pairs = [[0, 2], [0, 7], [1, 9], [1, 3], [1, 5], [2, 4], [2, 7], [3, 6], [3, 5], [3, 8], [3, 9],
-                               [4, 7], [5, 6]]
-    custom_distance_3_pairs = [[0, 3], [0, 8], [0, 5], [1, 4], [1, 7], [2, 6], [2, 8], [2, 9], [4, 8], [4, 9], [5, 7],
+    custom_distance_2_pairs = [[0, 2], [0, 7], [1, 3], [1, 5], [1, 9], [2, 4], [2, 7], [3, 5], [3, 6], [3, 8], [3, 9],
+                               [4, 7], [5, 6], [8, 9]]
+    custom_distance_3_pairs = [[0, 3], [0, 5], [0, 8], [1, 4], [1, 7], [2, 6], [2, 8], [2, 9], [4, 8], [4, 9], [5, 7],
                                [6, 7]]
-    custom_distance_4_pairs = [[0, 4], [1, 6], [1, 8]]
+    custom_distance_4_pairs = [[0, 4], [1, 6], [1, 8], [5, 8], [5, 9], [6, 8], [6, 9]]
 
     @staticmethod
     def triangular_neighbours(matrix):
@@ -39,7 +40,7 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
 
     @staticmethod
     def triangular(n):
-        return (n*(n+1)) / 2
+        return (n*(n-1)) / 2
 
     @staticmethod
     def create_fully_connected_matrix(size):
@@ -90,7 +91,8 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
     def check_calculate_on_fully_connected_matrix(self, size):
         matrix = DegreeAndDiameterCalculatorTest.create_fully_connected_matrix(size)
         triangular_size = DegreeAndDiameterCalculatorTest.triangular(size)
-        self.assertEqual(self.calculate(matrix), [size - 1, 1, (size-1) * triangular_size, triangular_size])
+        calculate = DegreeAndDiameterCalculator.calculate
+        self.assertEqual(calculate(matrix), [size - 1, 1, (size-1) * triangular_size, triangular_size])
 
     def test_calculate(self):
 
@@ -101,8 +103,8 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
         total_diameter = len(self.custom_distance_1_pairs) + (len(self.custom_distance_2_pairs) * 2) + (
                     len(self.custom_distance_3_pairs) * 3) + (len(self.custom_distance_4_pairs) * 4) + 5
         total_degree = DegreeAndDiameterCalculatorTest.triangular_neighbours(self.custom)
-
-        self.assertEqual(self.calculate(self.custom), [3, 5, total_degree, total_diameter])
+        calculate = DegreeAndDiameterCalculator.calculate
+        self.assertEqual(calculate(self.custom), [3, 5, total_degree, total_diameter])
 
 
 if __name__ == "__main__":
