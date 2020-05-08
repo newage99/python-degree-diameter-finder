@@ -14,10 +14,14 @@ class GeneticTree:
         score = DegreeAndDiameterCalculator.calculate(matrix)
         self.degree = score[0]
         self.diameter = score[1]
-        self.score = score[2] + score[3]
+        self.score1 = score[2] + score[3]
         self.mutation_tries = 0
         self.children = children if children else []
         self.__already_created_counter = 0
+
+    @property
+    def score0(self):
+        return self.degree + self.diameter
 
     def number_of_mutations(self):
         number = int(int(math.sqrt(self.mutation_tries)) / 2)
@@ -35,21 +39,20 @@ class GeneticTree:
         degree_plus_diameter = self.degree + self.diameter
         new_degree_plus_diameter = score[0] + score[1]
         return new_degree_plus_diameter < degree_plus_diameter or (
-                    new_degree_plus_diameter == degree_plus_diameter and score[2] + score[3] < self.score)
+                    new_degree_plus_diameter == degree_plus_diameter and score[2] + score[3] < self.score1)
 
     def mutate(self):
         number_of_mutations = self.number_of_mutations()
         mutated_id = self.id
-        not_mutated = True
         for i in range(number_of_mutations):
             mutated_id, matrix = GeneticTree.mutate_id_until_matrix_is_connected(mutated_id)
             score = DegreeAndDiameterCalculator.calculate(matrix)
             if self.is_score_better_than_actual(score):
-                self.children.append(GeneticTree(mutated_id, matrix=matrix))
-                not_mutated = False
-                break
-        if not_mutated:
-            self.mutation_tries += 1
+                new_tree = GeneticTree(mutated_id, matrix=matrix)
+                self.children.append(new_tree)
+                return new_tree
+        self.mutation_tries += 1
+        return self
 
     @staticmethod
     def load(json):

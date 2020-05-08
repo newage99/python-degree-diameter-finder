@@ -1,4 +1,5 @@
 from misc.Random import *
+from misc.config import wanted_length
 
 
 class IdGenerator:
@@ -31,7 +32,7 @@ class IdGenerator:
     # -------------------- #
 
     @staticmethod
-    def generate_id(length):
+    def generate_id(length=wanted_length):
         new_id, is_open_parenthesis, is_close_parenthesis = random_char()
         parenthesis_counter = 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
         while new_id in plus_minus_array:
