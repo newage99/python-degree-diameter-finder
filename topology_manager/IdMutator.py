@@ -1,13 +1,14 @@
 from misc.Random import *
-import unittest
+from misc.config import wanted_length
+import misc.global_variables
 
 
-class IdMutator(unittest.TestCase):
+class IdMutator:
 
-    id = ""
-    wanted_length = 0
-    pos_to_mutate = -1
-    char_to_mutate = ''
+    def __init__(self):
+        self.id = ""
+        self.pos_to_mutate = -1
+        self.char_to_mutate = ''
 
     # ---------------------------- #
     # -- PRIVATE STATIC METHODS -- #
@@ -107,14 +108,16 @@ class IdMutator(unittest.TestCase):
                 self.__insert_close_parenthesis_from_pos(self.id.rfind('(') + 4)
                 parenthesis_inserted = True
 
-    def __mutate_id(self):
+    def __mutate_id(self, get_additional_data: bool):
         self.calculate_pos_to_mutate()
         chars_available_to_mutate_to = self.get_chars_available_to_mutate_to()
         char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
         prefix, char_to_mutate_to, suffix = self.clean_char_to_mutate_to(char_to_mutate_to)
-        self.id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
+        new_id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
         self.__add_parenthesis_if_needed()
-        return self.id, self.pos_to_mutate, self.char_to_mutate, char_to_mutate_to
+        if get_additional_data:
+            return new_id, self.pos_to_mutate, self.char_to_mutate, char_to_mutate_to, prefix, suffix
+        return new_id
 
     # -------------------- #
     # -- PUBLIC METHODS -- #
@@ -168,11 +171,11 @@ class IdMutator(unittest.TestCase):
                 id_len = len(self.id)
                 # In case the length of the actual id is lesser than the wanted length,
                 # we insert a variable prev to the negation to convert it to a subtraction.
-                if id_len < self.wanted_length:
+                if id_len < wanted_length:
                     prefix = random_var_or_number()
                 # In case the length of the actual id is bigger than the wanted length, we remove the char to remove
                 # the negation. In negative case, we flip a coin to decide if we remove the negation or add a variable.
-                elif id_len > self.wanted_length or random_bool():
+                elif id_len > wanted_length or random_bool():
                     char_to_mutate_to = ''
                 else:
                     prefix = random_var_or_number()
@@ -180,7 +183,8 @@ class IdMutator(unittest.TestCase):
         elif self.char_to_mutate == '(':
             suffix_or_prefix = char_to_mutate_to in variables_and_numbers
             var_or_operator = char_to_mutate_to in operators
-            not_able_to_remove_char = next_char == '-' and self.pos_to_mutate > 0 and prev_char == '+'
+            not_able_to_remove_char = next_char == '-' and self.pos_to_mutate > 0 and (
+                        prev_char == '+' or prev_char == '-')
             if (char_to_mutate_to in variables_and_numbers and next_char != '-') or (
                     char_to_mutate_to in operators and (self.pos_to_mutate > 0 or next_char == '-')):
                 len_id = len(self.id)
@@ -189,7 +193,7 @@ class IdMutator(unittest.TestCase):
                 # SECOND CONDITIONAL: This means the id length will be equal to the wanted length after we remove an
                 # ')' char. In negative case, we flip a coin to decide if we add a char to the chars_to_mutate_to
                 # string or we don't insert any char at all.
-                if len_id <= self.wanted_length or (len_id == self.wanted_length+1 and random_bool()):
+                if len_id <= wanted_length or (len_id == wanted_length+1 and random_bool()):
                     # Given we want the id length to be equal to the wanted length,
                     # we add a char either to the prefix or suffix
                     prefix, suffix = IdMutator.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
@@ -207,7 +211,7 @@ class IdMutator(unittest.TestCase):
             var_or_operator = char_to_mutate_to in operators
             if char_to_mutate_to in variables_and_numbers or (char_to_mutate_to in operators and next_char != '-'):
                 len_id = len(self.id)
-                if len_id <= self.wanted_length or (len_id == self.wanted_length+1 and random_bool()):
+                if len_id <= wanted_length or (len_id == wanted_length+1 and random_bool()):
                     prefix, suffix = IdMutator.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
                 else:
                     char_to_mutate_to = ''
@@ -228,15 +232,12 @@ class IdMutator(unittest.TestCase):
 
         return prefix, char_to_mutate_to, suffix
 
-    def set_id_and_wanted_length(self, id_to_mutate, wanted_length):
-        self.id = id_to_mutate
-        self.wanted_length = wanted_length
-
     def calculate_pos_to_mutate(self):
         self.pos_to_mutate = random.randint(0, len(self.id) - 1)
         self.char_to_mutate = self.id[self.pos_to_mutate]
 
-    def mutate_id(self, id_to_mutate, wanted_length=None):
-        wanted_length = wanted_length if wanted_length else len(id_to_mutate)
-        self.set_id_and_wanted_length(id_to_mutate, wanted_length)
-        return self.__mutate_id()
+    @staticmethod
+    def mutate_id(id_to_mutate, get_additional_data: bool = False):
+        id_mutator = IdMutator()
+        id_mutator.id = id_to_mutate
+        return id_mutator.__mutate_id(get_additional_data)

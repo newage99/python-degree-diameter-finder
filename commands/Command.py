@@ -11,3 +11,7 @@ class Command(ABC):
     @abstractmethod
     def help(self):
         pass
+
+    @abstractmethod
+    def execute(self):
+        pass

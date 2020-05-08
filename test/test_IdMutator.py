@@ -1,25 +1,14 @@
 import unittest
-from id_manager.IdGenerator import IdGenerator
 import random
-from id_manager.IdMutator import IdMutator
+from topology_manager.IdGenerator import IdGenerator
+from topology_manager.IdMutator import IdMutator
 from misc.global_variables import *
 
 
 class IdMutatorTest(unittest.TestCase):
 
-    id_mutator = None
-
-    def calculate_char_to_mutate_and_return_cleaned_id_and_data(self, new_id):
-        self.id_mutator.set_id_and_wanted_length(new_id, len(new_id))
-        self.id_mutator.calculate_pos_to_mutate()
-        pos_to_mutate = self.id_mutator.pos_to_mutate
-        chars_available_to_mutate_to = self.id_mutator.get_chars_available_to_mutate_to()
-        char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
-        prefix, char_to_mutate_to, suffix = self.id_mutator.clean_char_to_mutate_to(char_to_mutate_to)
-        cleaned_id = new_id[:pos_to_mutate] + prefix + char_to_mutate_to + suffix + new_id[pos_to_mutate + 1:]
-        return cleaned_id, pos_to_mutate, self.id_mutator.char_to_mutate, char_to_mutate_to
-
-    def check_id(self, id, pos_to_mutate, char_to_mutate, char_to_mutate_to, check_parenthesis: bool = True):
+    def check_id(self, id, pos_to_mutate, char_to_mutate, char_to_mutate_to, prefix, suffix,
+                 check_parenthesis: bool = True):
 
         id_len = len(id)
         parenthesis_counter = 0
@@ -38,8 +27,8 @@ class IdMutatorTest(unittest.TestCase):
                 error = 'R'
             if error != '':
                 print('')
-                print(id + ' pos_to_mutate=' + str(
-                    pos_to_mutate) + ', char_to_mutate=' + char_to_mutate + ', char_to_mutate_to=' + char_to_mutate_to)
+                print(id + ' pos_to_mutate=' + str(pos_to_mutate) + ', char_to_mutate=' + char_to_mutate +
+                      ', char_to_mutate_to=' + char_to_mutate_to + ', prefix=' + prefix + ', suffix=' + suffix)
                 print((' ' * j) + '^ char \'' + id[j] + '\' must not be ' + (
                     'preceded' if error == 'L' else 'followed') + ' by char \'' + id[
                           j + (-1 if error == 'L' else 1)] + '\'')
@@ -48,13 +37,11 @@ class IdMutatorTest(unittest.TestCase):
             self.assertEqual(parenthesis_counter, 0, "Incorrect number of parenthesis.")
         self.assertFalse(id[id_len-1] in operators, "Id ends with an invalid character.")
 
-    def perform_mutation_stress_test(self, function_to_call, check_parenthesis: bool):
+    def perform_mutation_stress_test(self, check_parenthesis: bool):
 
         ids_lengths = [3, 5, 10, 25, 100]
         number_of_mutation_per_id = 50
         ids_per_length = 20
-        if self.id_mutator is None:
-            self.id_mutator = IdMutator()
 
         for length in ids_lengths:
             for i in range(1, ids_per_length + 1):
@@ -62,17 +49,14 @@ class IdMutatorTest(unittest.TestCase):
                 print('Testing ' + str(number_of_mutation_per_id) + ' mutations on id #' + str(
                     i) + ' ' + id + ' of length ' + str(length) + '...', end=" ")
                 for t in range(number_of_mutation_per_id):
-                    final_id, pos_to_mutate, char_to_mutate, char_to_mutate_to = function_to_call(id)
+                    final_id, pos_to_mutate, char_to_mutate, char_to_mutate_to, prefix, suffix = IdMutator.mutate_id(id, True)
                     self.check_id(id=final_id, pos_to_mutate=pos_to_mutate, char_to_mutate=char_to_mutate,
-                                  char_to_mutate_to=char_to_mutate_to, check_parenthesis=check_parenthesis)
+                                  char_to_mutate_to=char_to_mutate_to, prefix=prefix, suffix=suffix,
+                                  check_parenthesis=check_parenthesis)
                 print('OK')
 
-    # def test__clean_char_to_mutate_to(self):
-    #     self.perform_mutation_stress_test(self.calculate_char_to_mutate_and_return_cleaned_id_and_data, False)
-
     def test_mutate_id(self):
-        self.id_mutator = IdMutator()
-        self.perform_mutation_stress_test(self.id_mutator.mutate_id, True)
+        self.perform_mutation_stress_test(True)
 
 
 if __name__ == "__main__":

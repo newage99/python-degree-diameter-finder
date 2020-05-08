@@ -1,5 +1,5 @@
 import unittest
-from topology_manager.ExpressionInterpreter import ExpressionInterpreter
+from adjacency_matrix_manager.mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
 
 
 class ExpressionInterpreterTest(unittest.TestCase):

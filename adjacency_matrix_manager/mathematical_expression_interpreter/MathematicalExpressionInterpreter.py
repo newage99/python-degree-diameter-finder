@@ -1,5 +1,5 @@
-from topology_manager.Symbol import Symbol
-from topology_manager.Result import Result
+from adjacency_matrix_manager.mathematical_expression_interpreter.Symbol import Symbol
+from adjacency_matrix_manager.mathematical_expression_interpreter.Result import Result
 from math import log, pow
 import unittest
 from misc.global_variables import operators

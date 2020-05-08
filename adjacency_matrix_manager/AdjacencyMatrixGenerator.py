@@ -1,5 +1,6 @@
-from topology_manager.ExpressionInterpreter import ExpressionInterpreter
-from id_manager.IdGenerator import IdGenerator
+from adjacency_matrix_manager.mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
+from misc.config import number_of_nodes
+from topology_manager.IdGenerator import IdGenerator
 import networkx
 
 
@@ -26,7 +27,7 @@ class AdjacencyMatrixGenerator:
         return number_of_components == 1 and first_component_length == n
 
     @staticmethod
-    def generate_and_get_if_its_connected(id, n):
+    def generate_and_get_if_its_connected(id, n=number_of_nodes):
         matrix = []
         str_n = str(n)
         for x in range(0, n):
