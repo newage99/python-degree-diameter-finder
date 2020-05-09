@@ -10,10 +10,15 @@ class Command(ABC):
 
     @staticmethod
     @abstractmethod
-    def help():
+    def description():
         pass
 
     @staticmethod
     @abstractmethod
-    def execute():
+    def print_help():
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def execute(arguments):
         pass

@@ -1,4 +1,3 @@
-import json
 import math
 from topology_manager.IdMutator import IdMutator
 from score.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
@@ -7,7 +6,7 @@ from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGen
 
 class GeneticTree:
 
-    def __init__(self, id, children=None, matrix=None):
+    def __init__(self, id: str, children=None, matrix: list = None, iteration: int = 0):
         self.id = id
         if matrix is None:
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
@@ -15,16 +14,16 @@ class GeneticTree:
         self.degree = score[0]
         self.diameter = score[1]
         self.score1 = score[2] + score[3]
-        self.mutation_tries = 0
         self.children = children if children else []
-        self.__already_created_counter = 0
+        self.__initial_iteration = iteration
+        self.iteration = iteration
 
     @property
     def score0(self):
         return self.degree + self.diameter
 
     def number_of_mutations(self):
-        number = int(int(math.sqrt(self.mutation_tries)) / 2)
+        number = int(int(math.sqrt(self.iteration - self.__initial_iteration)) / 2)
         return 1 if number <= 0 else number
 
     def is_score_better_than_actual(self, score):
@@ -40,10 +39,10 @@ class GeneticTree:
             mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id)
             score = DegreeAndDiameterCalculator.calculate(matrix)
             if self.is_score_better_than_actual(score):
-                new_tree = GeneticTree(mutated_id, matrix=matrix)
+                new_tree = GeneticTree(mutated_id, matrix=matrix, iteration=self.iteration + 1)
                 self.children.append(new_tree)
                 return new_tree
-        self.mutation_tries += 1
+        self.iteration += 1
         return self
 
     @staticmethod
@@ -61,8 +60,9 @@ class GeneticTree:
     def to_json(self, indentation_exponent=1):
         indentation_str = '\t\t' * indentation_exponent
         ret = "{\n" + indentation_str + '"id": "' + self.id + '",\n' + indentation_str + '"degree": ' + str(self.degree)
-        ret += ",\n" + indentation_str + '"diameter": ' + str(self.diameter) + ",\n" + indentation_str
-        ret += '"score1": ' + str(self.score1) + ",\n" + indentation_str + '"children": ['
+        ret += ",\n" + indentation_str + '"diameter": ' + str(self.diameter) + ",\n" + indentation_str + '"score1": '
+        ret += str(self.score1) + ",\n" + indentation_str + '"iteration": ' + str(self.iteration) + ",\n"
+        ret += indentation_str + '"children": ['
         if len(self.children) > 0:
             ret += "\n" + indentation_str + "\t"
             for i in range(len(self.children)):
