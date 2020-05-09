@@ -11,8 +11,10 @@ class RunCommand(Command):
 
     @staticmethod
     def help():
-        print("The command 'run' executes the genetic algorithm for an specified number of iterations.")
-        print("The number of iterations must be provided as the first argument of the script.")
+        print("This command executes the genetic algorithm for an specified number of iterations.")
+        print("Arguments:")
+        print("1 - Number of iterations to execute.")
+        print("2 [OPTIONAL] - Name of the file to load the list of genetic trees from.")
         print("Example: 'python manage.py run 10' will execute 10 iterations of the algorithm.")
 
     @staticmethod
@@ -32,6 +34,9 @@ class RunCommand(Command):
         if invalid_iterations:
             print('Number of iterations must be a positive integer.')
         else:
+            trees_list = []
+            if len(sys.argv) > 2:
+                pass
             GeneticTreeManager.run(iterations)
 
 

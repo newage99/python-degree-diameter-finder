@@ -1,8 +1,7 @@
-import os
-import json
 from datetime import datetime
 from misc.config import number_of_trees
 from misc.config import save_results_frequency
+from misc.ResultsManager import ResultsManager
 from genetic_manager.GeneticTree import GeneticTree
 from topology_manager.IdGenerator import IdGenerator
 
@@ -14,47 +13,35 @@ class GeneticTreeManager:
     number_of_iterations = 0
     winning_tree = None
     iterations_when_last_saved = 0
-    results_file_name = "this_string_should_not_appear_as_txt_name"
+    results_file_name = None
 
     @staticmethod
-    def get_project_dir():
-        project_dir = os.path.dirname(__file__)
-        # This next line makes direct debug run from RunCommand work
-        project_dir = project_dir.replace("\\genetic_manager", "") if "genetic_manager" in project_dir else project_dir
-        return project_dir
-
-    @staticmethod
-    def create_results_folder_if_does_not_exists():
-        if not os.path.exists("results"):
-            os.makedirs("results")
-
-    @staticmethod
-    def save_results():
-        GeneticTreeManager.iterations_when_last_saved = GeneticTreeManager.number_of_iterations
-        initial_trees = GeneticTreeManager.initial_trees
+    def save_tree_list():
+        if GeneticTreeManager.results_file_name is None:
+            GeneticTreeManager.results_file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         str_to_write = "[\n\t"
-        for i in range(len(initial_trees)):
+        for i in range(len(GeneticTreeManager.initial_trees)):
             if i > 0:
                 str_to_write += ", \n\t"
-            str_to_write += initial_trees[i].to_json()
+            str_to_write += GeneticTreeManager.initial_trees[i].to_json()
         str_to_write += "\n]"
-        GeneticTreeManager.create_results_folder_if_does_not_exists()
-        full_file_name = GeneticTreeManager.results_file_name + ".txt"
-        filename = os.path.join(GeneticTreeManager.get_project_dir(), "results\\" + full_file_name)
-        f = open(filename, "w+")
-        f.write(str_to_write.replace("'", '"'))
-        f.close()
+        ResultsManager.write_results(GeneticTreeManager.results_file_name, str_to_write)
 
     @staticmethod
-    def run(iterations):
+    def run(iterations: int, trees_list: list = None):
+        # TODO: Implement GenericTree.parent attribute in order to remove initial_trees list.
         trees = GeneticTreeManager.trees
         initial_trees = GeneticTreeManager.initial_trees
-        if len(initial_trees) == 0:
-            while len(initial_trees) < number_of_trees:
-                new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
-                initial_trees.append(new_tree)
-                trees.append(new_tree)
-            GeneticTreeManager.results_file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        if len(initial_trees) == 0 or (trees_list is not None and len(trees_list) > 0):
+            if trees_list:
+                initial_trees = trees_list
+            else:
+                while len(initial_trees) < number_of_trees:
+                    new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
+                    initial_trees.append(new_tree)
+            trees = []
+            for tree in initial_trees:
+                trees.append(tree)
         final_number_of_iterations = GeneticTreeManager.number_of_iterations + iterations
 
         for i in range(GeneticTreeManager.number_of_iterations, final_number_of_iterations):
@@ -68,9 +55,7 @@ class GeneticTreeManager:
                         new_tree.degree) + ", diameter=" + str(new_tree.diameter) + ", score1=" + str(
                         new_tree.score1) + ")")
                     trees[j] = new_tree
-            if i > 0 and i % save_results_frequency == 0:
-                GeneticTreeManager.save_results()
+            if 0 < i < final_number_of_iterations - 1 and i % save_results_frequency == 0:
+                GeneticTreeManager.save_tree_list()
             GeneticTreeManager.number_of_iterations += 1
-        if GeneticTreeManager.iterations_when_last_saved != final_number_of_iterations:
-            GeneticTreeManager.save_results()
-
+        GeneticTreeManager.save_tree_list()
