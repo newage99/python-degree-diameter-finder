@@ -1,6 +1,9 @@
+import json
 import sys
 from commands.Command import Command
 from genetic_manager.GeneticTreeManager import GeneticTreeManager
+from genetic_manager.GeneticTree import GeneticTree
+from misc.ResultsManager import ResultsManager
 
 
 class RunCommand(Command):
@@ -27,32 +30,31 @@ class RunCommand(Command):
 
     @staticmethod
     def retrieve_iterations(arguments):
-
         if len(arguments) < 1:
             print('Introduce the number of operations you want to perform:', end=" ")
             iterations_str = input()
         else:
             iterations_str = arguments[0]
-
         try:
             iterations = int(iterations_str)
         except Exception as e:
             iterations = -1
-
         if iterations <= 0:
             print('Number of iterations must be a positive integer.')
-
         return iterations
 
     @staticmethod
     def execute(arguments):
-
         iterations = RunCommand.retrieve_iterations(arguments)
         if iterations > 0:
             trees_list = []
-            if len(sys.argv) > 2:
-                pass  # TODO
-            GeneticTreeManager.run(iterations)
+            if len(arguments) > 1:
+                results_file = ResultsManager.read_results(arguments[1])
+                if results_file:
+                    trees_dict_list = json.loads(results_file)
+                    for tree_dict in trees_dict_list:
+                        trees_list.append(GeneticTree.from_dict(tree_dict))
+            GeneticTreeManager.run(iterations, trees_list)
 
 
 if __name__ == '__main__':

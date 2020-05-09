@@ -4,24 +4,41 @@ import os
 class ResultsManager:
 
     @staticmethod
-    def get_project_dir():
+    def get_results_dir():
         project_dir = os.path.dirname(__file__)
-        project_dir = project_dir.replace("\\genetic_manager", "")
-        project_dir = project_dir.replace("\\misc", "")
-        return project_dir
+        project_dir = project_dir.replace("genetic_manager", "")
+        project_dir = project_dir.replace("misc", "")
+        return os.path.join(project_dir, "results")
 
     @staticmethod
-    def create_results_folder_if_does_not_exists(project_dir):
-        full_path = project_dir + "\\results"
-        if not os.path.exists(full_path):
-            os.makedirs(full_path)
+    def get_result_file_path(file_name, results_dir=None):
+        results_dir = results_dir if results_dir else ResultsManager.get_results_dir()
+        file_name = file_name if ".json" in file_name else file_name + ".json"
+        return os.path.join(results_dir, file_name)
 
     @staticmethod
     def write_results(file_name, results):
-        project_dir = ResultsManager.get_project_dir()
-        ResultsManager.create_results_folder_if_does_not_exists(project_dir)
-        full_file_name = file_name + ".txt"
-        filename = os.path.join(project_dir, "results\\" + full_file_name)
-        f = open(filename, "w+")
-        f.write(results)
-        f.close()
+        results_dir = ResultsManager.get_results_dir()
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)
+        results_file_path = ResultsManager.get_result_file_path(file_name, results_dir)
+        try:
+            f = open(results_file_path, "w+")
+            f.write(results)
+            f.close()
+        except Exception as e:
+            print("Error saving results: " + str(e))
+
+    @staticmethod
+    def read_results(file_name):
+        result_file_path = ResultsManager.get_result_file_path(file_name)
+        if os.path.exists(result_file_path):
+            try:
+                f = open(result_file_path, "r")
+                results = f.read()
+                return results
+            except Exception as e:
+                print("Error loading results: " + str(e))
+        else:
+            print("Results file does not exists or not located on results folder. Unable to load results.")
+        return None
