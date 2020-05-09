@@ -5,17 +5,20 @@ from genetic_manager.GeneticTreeManager import GeneticTreeManager
 
 class RunCommand(Command):
 
-    def str_to_execute_command(self):
+    @staticmethod
+    def str_to_execute_command():
         return "run"
 
-    def help(self):
+    @staticmethod
+    def help():
         print("The command 'run' executes the genetic algorithm for an specified number of iterations.")
         print("The number of iterations must be provided as the first argument of the script.")
         print("Example: 'python manage.py run 10' will execute 10 iterations of the algorithm.")
 
-    def execute(self):
+    @staticmethod
+    def execute():
         if len(sys.argv) < 2:
-            print('Introduce the number of operations you want to perform: ', end=" ")
+            print('Introduce the number of operations you want to perform:', end=" ")
             iterations = input()
         else:
             iterations = sys.argv[1]
@@ -30,3 +33,7 @@ class RunCommand(Command):
             print('Number of iterations must be a positive integer.')
         else:
             GeneticTreeManager.run(iterations)
+
+
+if __name__ == '__main__':
+    RunCommand.execute()

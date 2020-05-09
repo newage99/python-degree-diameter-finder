@@ -175,6 +175,8 @@ class ExpressionInterpreter(unittest.TestCase):
                 c = self.__get_next_symbol()
         except Exception as e:
             return 0
+        if len(self.numbers) <= 0 or len(self.numbers[0]) <= 0:
+            a = 0
         return self.numbers[0][0]
 
     # --------------------------- #

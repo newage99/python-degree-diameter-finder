@@ -27,14 +27,6 @@ class GeneticTree:
         number = int(int(math.sqrt(self.mutation_tries)) / 2)
         return 1 if number <= 0 else number
 
-    @staticmethod
-    def mutate_id_until_matrix_is_connected(id):
-        connected = False
-        while not connected:
-            mutated_id = IdMutator.mutate_id(id)
-            matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(mutated_id)
-        return mutated_id, matrix
-
     def is_score_better_than_actual(self, score):
         degree_plus_diameter = self.degree + self.diameter
         new_degree_plus_diameter = score[0] + score[1]
@@ -45,7 +37,7 @@ class GeneticTree:
         number_of_mutations = self.number_of_mutations()
         mutated_id = self.id
         for i in range(number_of_mutations):
-            mutated_id, matrix = GeneticTree.mutate_id_until_matrix_is_connected(mutated_id)
+            mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id)
             score = DegreeAndDiameterCalculator.calculate(matrix)
             if self.is_score_better_than_actual(score):
                 new_tree = GeneticTree(mutated_id, matrix=matrix)
@@ -66,5 +58,16 @@ class GeneticTree:
         except Exception as e:
             return False
 
-    def dump(self):
-        return json.dumps(self.__dict__)
+    def to_json(self, indentation_exponent=1):
+        indentation_str = '\t\t' * indentation_exponent
+        ret = "{\n" + indentation_str + "'id': '" + self.id + "',\n" + indentation_str + "'degree': " + str(self.degree)
+        ret += ",\n" + indentation_str + "'diameter': " + str(self.diameter) + ",\n" + indentation_str
+        ret += "'score1': " + str(self.score1) + ",\n" + indentation_str + "'children': ["
+        if len(self.children) > 0:
+            ret += "\n" + indentation_str + "\t"
+            for i in range(len(self.children)):
+                if i > 0:
+                    ret += ", "
+                ret += self.children[i].to_json(indentation_exponent + 1)
+            ret += "\n" + indentation_str
+        return ret + "]\n\t" + ('\t\t' * (indentation_exponent - 1)) + "}"

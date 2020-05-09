@@ -1,6 +1,7 @@
-from misc.Random import *
+from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
-import misc.global_variables
+from misc.global_variables import characters, operators, variables_and_numbers
+from misc.Random import *
 
 
 class IdMutator:
@@ -56,57 +57,60 @@ class IdMutator:
                 pos -= 1
         return False
 
-    def __insert_open_parenthesis_until_pos(self, pos):
+    @staticmethod
+    def insert_open_parenthesis_until_pos(id, pos):
         positions_to_insert_open_parenthesis = []
         while pos >= 0:
-            prev_char = self.id[pos - 1] if pos > 0 else ''
-            if self.id[pos] == ')':
+            prev_char = id[pos - 1] if pos > 0 else ''
+            if id[pos] == ')':
                 pos -= 3
-            elif (prev_char in (operators + "(") or prev_char == '') and self.id[pos] in (variables_and_numbers + "("):
+            elif (prev_char in (operators + "(") or prev_char == '') and id[pos] in (variables_and_numbers + "("):
                 positions_to_insert_open_parenthesis.append(pos)
             pos -= 1
         there_are_positions_to_insert_open_parenthesis = len(positions_to_insert_open_parenthesis) > 0
         if there_are_positions_to_insert_open_parenthesis:
             pos = positions_to_insert_open_parenthesis[random.randint(0, len(positions_to_insert_open_parenthesis) - 1)]
-            self.id = self.id[:pos] + "(" + self.id[pos:]
-        return there_are_positions_to_insert_open_parenthesis
+            return id[:pos] + "(" + id[pos:]
+        return id
 
-    def __insert_close_parenthesis_from_pos(self, pos):
+    @staticmethod
+    def insert_close_parenthesis_from_pos(id, pos):
         positions_to_insert_close_parenthesis = []
-        len_id = len(self.id)
+        len_id = len(id)
         while pos < len_id:
-            prev_char = self.id[pos - 1] if pos > 0 else ''
-            if self.id[pos] == '(':
+            prev_char = id[pos - 1] if pos > 0 else ''
+            if id[pos] == '(':
                 pos += 3
-            elif prev_char in (variables_and_numbers + ")") and self.id[pos] in (operators + ")"):
+            elif prev_char in (variables_and_numbers + ")") and id[pos] in (operators + ")"):
                 positions_to_insert_close_parenthesis.append(pos)
             pos += 1
         positions_to_insert_close_parenthesis.append(len_id)
         pos = positions_to_insert_close_parenthesis[random.randint(0, len(positions_to_insert_close_parenthesis) - 1)]
         if pos == len_id:
-            self.id += ")"
-        else:
-            self.id = self.id[:pos] + ")" + self.id[pos:]
+            return id + ")"
+        return id[:pos] + ")" + id[pos:]
 
-    def __add_parenthesis_if_needed(self):
+    @staticmethod
+    def add_parenthesis_if_needed(id):
         parenthesis_inserted = True
         while parenthesis_inserted:
             parenthesis_inserted = False
             parenthesis_counter = 0
-            for i in range(len(self.id)):
-                char = self.id[i]
+            for i in range(len(id)):
+                char = id[i]
                 if char == '(':
                     parenthesis_counter += 1
                 elif char == ')':
                     if parenthesis_counter == 0:
-                        self.__insert_open_parenthesis_until_pos(i - 3)
+                        id = IdMutator.insert_open_parenthesis_until_pos(id, i - 3)
                         parenthesis_inserted = True
                         break
                     parenthesis_counter -= 1
             # This means there has been one or more open parenthesis not closed.
             if not parenthesis_inserted and parenthesis_counter > 0:
-                self.__insert_close_parenthesis_from_pos(self.id.rfind('(') + 4)
+                id = IdMutator.insert_close_parenthesis_from_pos(id, id.rfind('(') + 4)
                 parenthesis_inserted = True
+        return id
 
     def __mutate_id(self, get_additional_data: bool):
         self.calculate_pos_to_mutate()
@@ -114,7 +118,7 @@ class IdMutator:
         char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
         prefix, char_to_mutate_to, suffix = self.clean_char_to_mutate_to(char_to_mutate_to)
         new_id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
-        self.__add_parenthesis_if_needed()
+        new_id = IdMutator.add_parenthesis_if_needed(new_id)
         if get_additional_data:
             return new_id, self.pos_to_mutate, self.char_to_mutate, char_to_mutate_to, prefix, suffix
         return new_id
@@ -236,8 +240,20 @@ class IdMutator:
         self.pos_to_mutate = random.randint(0, len(self.id) - 1)
         self.char_to_mutate = self.id[self.pos_to_mutate]
 
+    # --------------------------- #
+    # -- PUBLIC STATIC METHODS -- #
+    # --------------------------- #
+
     @staticmethod
     def mutate_id(id_to_mutate, get_additional_data: bool = False):
         id_mutator = IdMutator()
         id_mutator.id = id_to_mutate
         return id_mutator.__mutate_id(get_additional_data)
+
+    @staticmethod
+    def mutate_to_connected_matrix_id(id_to_mutate):
+        connected = False
+        while not connected:
+            mutated_id = IdMutator.mutate_id(id_to_mutate)
+            matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(mutated_id)
+        return mutated_id, matrix

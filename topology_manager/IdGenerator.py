@@ -58,3 +58,12 @@ class IdGenerator:
                 new_id += ")"
                 parenthesis_counter -= 1
         return new_id
+
+    @staticmethod
+    def generate_connected_matrix_id():
+        connected = False
+        while not connected:
+            id = IdGenerator.generate_id()
+            from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+            matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
+        return id

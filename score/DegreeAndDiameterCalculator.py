@@ -29,9 +29,9 @@ class DegreeAndDiameterCalculator:
     def calculate(matrix):
 
         len_matrix = len(matrix)
-        number_of_neighbours = {}
+        number_of_neighbours = []
         for i in range(0, len_matrix):
-            number_of_neighbours[i] = sum(matrix[i])
+            number_of_neighbours.append(sum(matrix[i]))
 
         degree = 0
         diameter = 0
@@ -39,17 +39,20 @@ class DegreeAndDiameterCalculator:
         total_diameter = 0
 
         for x in range(0, len_matrix - 1):
+            actual_degree = number_of_neighbours[x]
+            if actual_degree > degree:
+                degree = actual_degree
             for y in range(x+1, len_matrix):
-                actual_degree = (number_of_neighbours[x] + number_of_neighbours[y]) / 2
+                avg_degree = (number_of_neighbours[x] + number_of_neighbours[y]) / 2
                 actual_diameter = DegreeAndDiameterCalculator.shortest_path_length_between_two_nodes(matrix, x, y)
                 if actual_diameter == -1:
                     # This means dijkstra has not found a path between the two nodes, so the matrix is not connected.
                     return None
-                total_degree += actual_degree
+                total_degree += avg_degree
                 total_diameter += actual_diameter
-                if actual_degree > degree:
-                    degree = actual_degree
                 if actual_diameter > diameter:
                     diameter = actual_diameter
+        if number_of_neighbours[-1] > degree:
+            degree = number_of_neighbours[-1]
 
         return [degree, diameter, total_degree, total_diameter]

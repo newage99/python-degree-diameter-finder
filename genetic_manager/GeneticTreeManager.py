@@ -17,17 +17,32 @@ class GeneticTreeManager:
     results_file_name = "this_string_should_not_appear_as_txt_name"
 
     @staticmethod
+    def get_project_dir():
+        project_dir = os.path.dirname(__file__)
+        # This next line makes direct debug run from RunCommand work
+        project_dir = project_dir.replace("\\genetic_manager", "") if "genetic_manager" in project_dir else project_dir
+        return project_dir
+
+    @staticmethod
+    def create_results_folder_if_does_not_exists():
+        if not os.path.exists("results"):
+            os.makedirs("results")
+
+    @staticmethod
     def save_results():
         GeneticTreeManager.iterations_when_last_saved = GeneticTreeManager.number_of_iterations
         initial_trees = GeneticTreeManager.initial_trees
-        str_to_write = "["
+        str_to_write = "[\n\t"
         for i in range(len(initial_trees)):
             if i > 0:
-                str_to_write += ","
-            str_to_write += json.dumps(initial_trees[i].__dict__)
-        filename = os.path.join(os.path.dirname(__file__), "results/" + GeneticTreeManager.results_file_name + ".txt")
-        f = open(filename, "w")
-        f.write(str_to_write + "]")
+                str_to_write += ", \n\t"
+            str_to_write += initial_trees[i].to_json()
+        str_to_write += "\n]"
+        GeneticTreeManager.create_results_folder_if_does_not_exists()
+        full_file_name = GeneticTreeManager.results_file_name + ".txt"
+        filename = os.path.join(GeneticTreeManager.get_project_dir(), "results\\" + full_file_name)
+        f = open(filename, "w+")
+        f.write(str_to_write.replace("'", '"'))
         f.close()
 
     @staticmethod
@@ -36,19 +51,20 @@ class GeneticTreeManager:
         initial_trees = GeneticTreeManager.initial_trees
         if len(initial_trees) == 0:
             while len(initial_trees) < number_of_trees:
-                initial_trees.append(GeneticTree(IdGenerator.generate_id()))
-            trees = initial_trees
-            GeneticTreeManager.results_file_name = datetime.now().strftime("%Y/%m/%d_%H:%M:%S")
+                new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
+                initial_trees.append(new_tree)
+                trees.append(new_tree)
+            GeneticTreeManager.results_file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         final_number_of_iterations = GeneticTreeManager.number_of_iterations + iterations
 
         for i in range(GeneticTreeManager.number_of_iterations, final_number_of_iterations):
-            print("Iteration " + str(i) + "/" + str(final_number_of_iterations) + "...")
+            print("Iteration " + str(i + 1) + "/" + str(final_number_of_iterations) + "...")
             for j in range(len(trees)):
                 new_tree = trees[j].mutate()
                 if new_tree != trees[j]:
-                    print("Tree " + str(j) + ": Id " + trees[j].id + " (degree=" + str(
+                    print("Tree " + str(j) + ":  " + trees[j].id + "  (degree=" + str(
                         trees[j].degree) + ", diameter=" + str(trees[j].diameter) + ", score1=" + str(
-                        trees[j].score1) + ") mutated to id " + new_tree.id + " (degree=" + str(
+                        trees[j].score1) + ") mutated to  " + new_tree.id + "  (degree=" + str(
                         new_tree.degree) + ", diameter=" + str(new_tree.diameter) + ", score1=" + str(
                         new_tree.score1) + ")")
                     trees[j] = new_tree
