@@ -6,7 +6,7 @@ from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGen
 
 class GeneticTree:
 
-    def __init__(self, id: str, iteration: int = 0, children=None, degree: int = -1, diameter: int = -1,
+    def __init__(self, id: str, iteration: int = -1, children=None, degree: int = -1, diameter: int = -1,
                  score1: int = -1):
         self.id = id
         self.__initial_iteration = iteration
@@ -40,6 +40,7 @@ class GeneticTree:
                     new_degree_plus_diameter == degree_plus_diameter and score[2] + score[3] < self.score1)
 
     def mutate(self):
+        self.iteration += 1
         number_of_mutations = self.number_of_mutations()
         mutated_id = self.id
         for i in range(number_of_mutations):
@@ -47,10 +48,9 @@ class GeneticTree:
             score = DegreeAndDiameterCalculator.calculate(matrix)
             if self.is_score_better_than_actual(score):
                 new_tree = GeneticTree(mutated_id, degree=score[0], diameter=score[1], score1=score[2] + score[3],
-                                       iteration=self.iteration + 1)
+                                       iteration=self.iteration)
                 self.children.append(new_tree)
                 return new_tree
-        self.iteration += 1
         return self
 
     @staticmethod
