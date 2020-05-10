@@ -52,20 +52,18 @@ class GeneticTree:
         return new_score0 < score0 or (new_score0 == score0 and score1_better_than_actual)
 
     def is_score_better_than_children(self, score):
-        new_degree_plus_diameter = score[0] + score[1]
+        new_score0 = score[0] + score[1]
         for child in self.children:
-            child_degree_plus_diameter = child.degree + child.diameter
-            if child_degree_plus_diameter < new_degree_plus_diameter or (
-                    new_degree_plus_diameter == child_degree_plus_diameter and child.score1 < score[2] + score[3]):
+            child_score0 = child.score0
+            if child_score0 < new_score0 or (child_score0 == new_score0 and child.score1 < score[2] + score[3]):
                 return False
         return True
 
     def is_score_equal_than_children(self, score):
-        new_degree_plus_diameter = score[0] + score[1]
+        new_score0 = score[0] + score[1]
         for child in self.children:
-            child_degree_plus_diameter = child.degree + child.diameter
-            if child_degree_plus_diameter != new_degree_plus_diameter or (
-                    new_degree_plus_diameter == child_degree_plus_diameter and child.score1 != score[2] + score[3]):
+            child_score0 = child.score0
+            if child_score0 != new_score0 or (child_score0 == new_score0 and child.score1 != score[2] + score[3]):
                 return False
         return True
 
@@ -87,11 +85,14 @@ class GeneticTree:
                 self.__initial_iteration = self.iteration
                 new_tree = GeneticTree(mutated_id, degree=score[0], diameter=score[1], score1=score[2] + score[3],
                                        iteration=self.iteration)
-                if self.is_score_equal_than_children(score):
-                    self.children.append(new_tree)
-                elif self.is_score_better_than_children(score):
-                    self.children = [new_tree]
-                return new_tree
+                score_better_than_children = self.is_score_better_than_children(score)
+                score_equal_than_children = self.is_score_equal_than_children(score)
+                if score_equal_than_children or score_better_than_children:
+                    if score_better_than_children:
+                        self.children = [new_tree]
+                    else:
+                        self.children.append(new_tree)
+                    return new_tree
         return self
 
     @staticmethod
