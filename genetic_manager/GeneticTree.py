@@ -26,30 +26,71 @@ class GeneticTree:
     def score0(self):
         return self.degree + self.diameter
 
-    def get_last_child(self):
-        return self if len(self.children) <= 0 else self.children[0].get_last_child()
+    def get_last_child(self, parent=None):
+        if len(self.children) > 0:
+            best_child = None
+            best_parent = None
+            for child in self.children:
+                new_child, new_parent = child.get_last_child(self)
+                if best_child is None or best_child.is_score_better_than_self(new_child.score()):
+                    best_child = new_child
+                    best_parent = new_parent
+            return best_child, best_parent
+        return self, parent
+
+    def score(self):
+        return [self.degree, self.diameter, self.score1, 0]
 
     def number_of_mutations(self):
-        number = int(int(math.sqrt(self.iteration - self.__initial_iteration)) / 2)
+        number = (int(int(math.sqrt(self.iteration - self.__initial_iteration)) / 2)) - len(self.children)
         return 1 if number <= 0 else number
 
-    def is_score_better_than_actual(self, score):
-        degree_plus_diameter = self.degree + self.diameter
+    def is_score_better_than_self(self, score):
+        score0 = self.score0
+        new_score0 = score[0] + score[1]
+        score1_better_than_actual = score[2] + score[3] < self.score1
+        return new_score0 < score0 or (new_score0 == score0 and score1_better_than_actual)
+
+    def is_score_better_than_children(self, score):
         new_degree_plus_diameter = score[0] + score[1]
-        return new_degree_plus_diameter < degree_plus_diameter or (
-                    new_degree_plus_diameter == degree_plus_diameter and score[2] + score[3] < self.score1)
+        for child in self.children:
+            child_degree_plus_diameter = child.degree + child.diameter
+            if child_degree_plus_diameter < new_degree_plus_diameter or (
+                    new_degree_plus_diameter == child_degree_plus_diameter and child.score1 < score[2] + score[3]):
+                return False
+        return True
+
+    def is_score_equal_than_children(self, score):
+        new_degree_plus_diameter = score[0] + score[1]
+        for child in self.children:
+            child_degree_plus_diameter = child.degree + child.diameter
+            if child_degree_plus_diameter != new_degree_plus_diameter or (
+                    new_degree_plus_diameter == child_degree_plus_diameter and child.score1 != score[2] + score[3]):
+                return False
+        return True
+
+    def get_children_ids(self):
+        ids = []
+        for child in self.children:
+            ids.append(child.id)
+        return ids
 
     def mutate(self):
         self.iteration += 1
         number_of_mutations = self.number_of_mutations()
         mutated_id = self.id
         for i in range(number_of_mutations):
-            mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id)
+            mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id,
+                                                                         prohibited_ids=self.get_children_ids())
             score = DegreeAndDiameterCalculator.calculate(matrix)
-            if self.is_score_better_than_actual(score):
+            if self.is_score_better_than_self(score):
+                self.__initial_iteration = self.iteration
                 new_tree = GeneticTree(mutated_id, degree=score[0], diameter=score[1], score1=score[2] + score[3],
                                        iteration=self.iteration)
-                self.children.append(new_tree)
+                if self.is_score_equal_than_children(score):
+                    self.children.append(new_tree)
+                elif self.is_score_better_than_children(score):
+                    self.children = [new_tree]
                 return new_tree
         return self
 

@@ -251,9 +251,14 @@ class IdMutator:
         return id_mutator.__mutate_id(get_additional_data)
 
     @staticmethod
-    def mutate_to_connected_matrix_id(id_to_mutate):
+    def mutate_to_connected_matrix_id(id_to_mutate, prohibited_ids=None):
+        if prohibited_ids is None:
+            prohibited_ids = []
         connected = False
         while not connected:
-            mutated_id = IdMutator.mutate_id(id_to_mutate)
+            prohibited_id = True
+            while prohibited_id:
+                mutated_id = IdMutator.mutate_id(id_to_mutate)
+                prohibited_id = mutated_id in prohibited_ids
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(mutated_id)
         return mutated_id, matrix
