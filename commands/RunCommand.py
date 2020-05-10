@@ -36,8 +36,7 @@ class RunCommand(Command):
               "to be preserved from --load file name or if --load argument was not specified, is going to be formed " +
               "by the timestamp at the moment of saving.")
         print("--ntrees=<number_of_trees> ->  If you type '--ntrees' and then you specify a positive integer, this " +
-              "will set the number of trees the list has. Given a results file implicitly specifies the number of " +
-              "trees to use, this parameter is not compatible will '--load'.")
+              "will set the number of trees the list has.")
         print("")
         print("EXAMPLES:")
         print(" 'python manage.py run 10'                             will execute 10 iterations of the algorithm. " +

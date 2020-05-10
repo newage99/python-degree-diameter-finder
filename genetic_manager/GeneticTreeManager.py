@@ -42,10 +42,9 @@ class GeneticTreeManager:
         if len(GeneticTreeManager.initial_trees) == 0 or (trees_list is not None and len(trees_list) > 0):
             if trees_list:
                 GeneticTreeManager.initial_trees = trees_list
-            else:
-                while len(GeneticTreeManager.initial_trees) < number_of_trees:
-                    new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
-                    GeneticTreeManager.initial_trees.append(new_tree)
+            while len(GeneticTreeManager.initial_trees) < number_of_trees:
+                new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
+                GeneticTreeManager.initial_trees.append(new_tree)
             GeneticTreeManager.trees = []
             for tree in GeneticTreeManager.initial_trees:
                 # This two next lines assure us that the actual trees will be the penultimate trees of the initial trees
