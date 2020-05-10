@@ -57,17 +57,30 @@ class GeneticTreeManager:
             for j in range(len(GeneticTreeManager.trees)):
                 tree = GeneticTreeManager.trees[j]
                 no_child_mutated = True
+                child_mutated_to_equal_pair = None
                 for child in tree.children:
-                    new_tree = child.mutate()
+                    new_tree, is_better_than_child = child.mutate()
                     if new_tree != child:
-                        GeneticTreeManager.print_successful_mutation("Child", child, new_tree, j)
-                        GeneticTreeManager.trees[j] = child
-                        no_child_mutated = False
-                        break
+                        new_child_not_in_children = new_tree.id not in tree.get_children_ids()
+                        if is_better_than_child or new_child_not_in_children:
+                            if is_better_than_child:
+                                GeneticTreeManager.trees[j] = child
+                                GeneticTreeManager.print_successful_mutation("Child", child, new_tree, j)
+                                no_child_mutated = False
+                                break
+                            else:
+                                child_mutated_to_equal_pair = [child, new_tree]
                 if no_child_mutated:
-                    new_tree = tree.mutate()
-                    if new_tree != tree:
-                        GeneticTreeManager.print_successful_mutation("Father", tree, new_tree, j)
+                    if child_mutated_to_equal_pair:
+                        GeneticTreeManager.print_successful_mutation("Child (E)", child_mutated_to_equal_pair[0],
+                                                                     child_mutated_to_equal_pair[1], j)
+                        GeneticTreeManager.trees[j].children.append(child_mutated_to_equal_pair[1])
+                    else:
+                        new_tree, is_better_than_child = tree.mutate()
+                        # In this case, is_better_than_child variable does not represent anything,
+                        # given we are not a child but the father
+                        if new_tree != tree:
+                            GeneticTreeManager.print_successful_mutation("Father", tree, new_tree, j)
             sys.stdout.flush()
             if 0 < i < final_number_of_iterations - 1 and i % save_results_frequency == 0:
                 print(" Auto-saving results... (Actual saving frequency: " + str(save_results_frequency) + " iterations)")

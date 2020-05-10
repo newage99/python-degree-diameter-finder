@@ -48,8 +48,8 @@ class IdMutatorTest(unittest.TestCase):
                 print('Testing ' + str(number_of_mutation_per_id) + ' mutations on id #' + str(
                     i) + ' ' + id + ' of length ' + str(length) + '...', end=" ")
                 for t in range(number_of_mutation_per_id):
-                    final_id, pos_to_mutate, char_to_mutate, char_to_mutate_to, prefix, suffix = IdMutator.mutate_id(id, True)
-                    self.check_id(id=final_id, pos_to_mutate=pos_to_mutate, char_to_mutate=char_to_mutate,
+                    final_id, pos, char_to_mutate, char_to_mutate_to, prefix, suffix = IdMutator.mutate_id(id, True)
+                    self.check_id(id=final_id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
                                   char_to_mutate_to=char_to_mutate_to, prefix=prefix, suffix=suffix,
                                   check_parenthesis=check_parenthesis)
                 print('OK')

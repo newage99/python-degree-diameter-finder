@@ -51,11 +51,16 @@ class GeneticTree:
         score1_better_than_actual = score[2] + score[3] < self.score1
         return new_score0 < score0 or (new_score0 == score0 and score1_better_than_actual)
 
+    def is_score_equal_than_self(self, score):
+        new_score0 = score[0] + score[1]
+        score1_equal_than_actual = score[2] + score[3] == self.score1
+        return new_score0 == self.score0 and score1_equal_than_actual
+
     def is_score_better_than_children(self, score):
         new_score0 = score[0] + score[1]
         for child in self.children:
             child_score0 = child.score0
-            if child_score0 < new_score0 or (child_score0 == new_score0 and child.score1 < score[2] + score[3]):
+            if child_score0 < new_score0 or (child_score0 == new_score0 and child.score1 <= score[2] + score[3]):
                 return False
         return True
 
@@ -81,19 +86,27 @@ class GeneticTree:
             mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id,
                                                                          prohibited_ids=self.get_children_ids())
             score = DegreeAndDiameterCalculator.calculate(matrix)
-            if self.is_score_better_than_self(score):
-                self.__initial_iteration = self.iteration
+            score_better_than_self = self.is_score_better_than_self(score)
+            score_equal_than_self = self.is_score_equal_than_self(score)
+            if score_better_than_self or score_equal_than_self:
                 new_tree = GeneticTree(mutated_id, degree=score[0], diameter=score[1], score1=score[2] + score[3],
                                        iteration=self.iteration)
-                score_better_than_children = self.is_score_better_than_children(score)
-                score_equal_than_children = self.is_score_equal_than_children(score)
-                if score_equal_than_children or score_better_than_children:
-                    if score_better_than_children:
-                        self.children = [new_tree]
-                    else:
-                        self.children.append(new_tree)
-                    return new_tree
-        return self
+                if score_better_than_self:
+                    score_better_than_children = self.is_score_better_than_children(score)
+                    score_equal_than_children = self.is_score_equal_than_children(score)
+                    if score_equal_than_children or score_better_than_children:
+                        self.__initial_iteration = self.iteration
+                        if score_better_than_children:
+                            self.children = [new_tree]
+                        else:
+                            self.children.append(new_tree)
+                        return new_tree, True
+                elif len(self.children) <= 0:
+                    self.__initial_iteration = self.iteration
+                    # This means that we are a child that has founded an id equal than him. We must returned for
+                    # the father to added to his list of children.
+                    return new_tree, False
+        return self, False
 
     @staticmethod
     def from_dict(obj):

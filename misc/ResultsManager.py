@@ -36,9 +36,7 @@ class ResultsManager:
             try:
                 f = open(result_file_path, "r")
                 results = f.read()
-                return results
+                return results, None
             except Exception as e:
-                print("Error loading results: " + str(e))
-        else:
-            print("Results file does not exists or not located on results folder. Unable to load results.")
-        return None
+                return None,  "Error loading results file: " + str(e)
+        return None, "Results file does not exists or not located on results folder."
