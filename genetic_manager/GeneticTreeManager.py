@@ -1,6 +1,5 @@
 import sys
 from datetime import datetime
-from misc.config import number_of_trees
 from misc.config import save_results_frequency
 from misc.ResultsManager import ResultsManager
 from genetic_manager.GeneticTree import GeneticTree
@@ -36,7 +35,9 @@ class GeneticTreeManager:
               str(new_tree.score1) + ")")
 
     @staticmethod
-    def run(iterations: int, trees_list: list = None):
+    def run(iterations: int, number_of_trees: int, trees_list: list = None):
+        if number_of_trees <= 0:
+            number_of_trees = 1
         # TODO: Implement GenericTree.parent attribute in order to remove initial_trees list.
         if len(GeneticTreeManager.initial_trees) == 0 or (trees_list is not None and len(trees_list) > 0):
             if trees_list:
@@ -66,6 +67,7 @@ class GeneticTreeManager:
                             if is_better_than_child:
                                 GeneticTreeManager.trees[j] = child
                                 GeneticTreeManager.print_successful_mutation("Child", child, new_tree, j)
+                                sys.stdout.flush()
                                 no_child_mutated = False
                                 break
                             else:
@@ -74,6 +76,7 @@ class GeneticTreeManager:
                     if child_mutated_to_equal_pair:
                         GeneticTreeManager.print_successful_mutation("Child (E)", child_mutated_to_equal_pair[0],
                                                                      child_mutated_to_equal_pair[1], j)
+                        sys.stdout.flush()
                         GeneticTreeManager.trees[j].children.append(child_mutated_to_equal_pair[1])
                     else:
                         new_tree, is_better_than_child = tree.mutate()
@@ -81,7 +84,7 @@ class GeneticTreeManager:
                         # given we are not a child but the father
                         if new_tree != tree:
                             GeneticTreeManager.print_successful_mutation("Father", tree, new_tree, j)
-            sys.stdout.flush()
+                            sys.stdout.flush()
             if 0 < i < final_number_of_iterations - 1 and i % save_results_frequency == 0:
                 print(" Auto-saving results... (Actual saving frequency: " + str(save_results_frequency) + " iterations)")
                 GeneticTreeManager.save_tree_list()

@@ -4,6 +4,7 @@ from commands.Command import Command
 from genetic_manager.GeneticTreeManager import GeneticTreeManager
 from genetic_manager.GeneticTree import GeneticTree
 from misc.ResultsManager import ResultsManager
+from misc.config import number_of_trees
 
 
 class RunCommand(Command):
@@ -26,14 +27,17 @@ class RunCommand(Command):
         print("Position 1 -> Number of iterations to execute.")
         print("")
         print("OPTIONAL ARGUMENTS:")
-        print("--load=<file_name> -> If you type '--load=' and then you specify a file name existing on results " +
-              "folder, the tree list contained in that file is going to be loaded and used to execute the genetic " +
-              "algorithm.")
-        print("--save=<file_name> -> If you type '--save=' and then specify a file name, the results of the genetic " +
-              "algorithm execution are going to be saved with that file name on results folder.")
-        print("If you don't specify any --save argument, results file name is going to be preserved from --load " +
-              "file name or if --load argument was not specified, is going to be formed by the timestamp at the " +
-              "moment of saving.")
+        print("--load=<file_name> ->          If you type '--load=' and then you specify a file name existing on " +
+              "results folder, the tree list contained in that file is going to be loaded and used to execute the " +
+              "genetic algorithm.")
+        print("--save=<file_name> ->          If you type '--save=' and then specify a file name, the results of the " +
+              "genetic algorithm execution are going to be saved with that file name on results folder.")
+        print("                               If you don't specify any --save argument, results file name is going " +
+              "to be preserved from --load file name or if --load argument was not specified, is going to be formed " +
+              "by the timestamp at the moment of saving.")
+        print("--ntrees=<number_of_trees> ->  If you type '--ntrees' and then you specify a positive integer, this " +
+              "will set the number of trees the list has. Given a results file implicitly specifies the number of " +
+              "trees to use, this parameter is not compatible will '--load'.")
         print("")
         print("EXAMPLES:")
         print(" 'python manage.py run 10'                             will execute 10 iterations of the algorithm. " +
@@ -42,6 +46,8 @@ class RunCommand(Command):
               "existing tree list stored in file '2020_05_10_16_34_37.json'. Results will be stored on the same file.")
         print(" 'python manage.py run 37 --load=test1 --save=test2'   will execute 37 iterations on tree list stored " +
               "in 'test1.json' file, but results will be stored on file 'test2.json'.")
+        print(" 'python manage.py run 120 --ntrees=5'                 will execute 120 iterations of the algorithm " +
+              "using a list of 5 trees.")
 
     @staticmethod
     def retrieve_iterations(arguments):
@@ -64,6 +70,7 @@ class RunCommand(Command):
         if iterations > 0:
             trees_list = []
             invalid_argument_pos_and_reason = None
+            n_trees = number_of_trees
             if len(arguments) > 1:
                 save_file_name = None
                 for i in range(1, len(arguments)):
@@ -90,6 +97,17 @@ class RunCommand(Command):
                             invalid_argument_pos_and_reason = [i, "Read file name not provided"]
                         else:
                             save_file_name = values[1]
+                    elif arg.startswith('--ntrees='):
+                        values = arg.split("=")
+                        if len(values) < 2 or len(values[1]) <= 0:
+                            invalid_argument_pos_and_reason = [i, "Number of trees not provided"]
+                        else:
+                            try:
+                                n_trees = int(values[1])
+                                if n_trees <= 0:
+                                    invalid_argument_pos_and_reason = [i, "Number of trees is not a positive integer"]
+                            except Exception as e:
+                                invalid_argument_pos_and_reason = [i, "Number of trees is not an integer"]
                     else:
                         invalid_argument_pos_and_reason = [i, "Argument not recognized."]
                     if invalid_argument_pos_and_reason:
@@ -101,7 +119,7 @@ class RunCommand(Command):
                 reason = invalid_argument_pos_and_reason[1]
                 print("Error at argument in position " + str(pos) + ": " + reason)
             else:
-                GeneticTreeManager.run(iterations, trees_list)
+                GeneticTreeManager.run(iterations, n_trees, trees_list)
 
 
 if __name__ == '__main__':
