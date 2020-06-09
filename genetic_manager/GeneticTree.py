@@ -1,4 +1,5 @@
 import math
+from misc.config import max_number_of_children
 from topology_manager.IdMutator import IdMutator
 from score.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
@@ -78,7 +79,7 @@ class GeneticTree:
             ids.append(child.id)
         return ids
 
-    def mutate(self):
+    def mutate(self, child: bool = True):
         self.iteration += 1
         number_of_mutations = self.number_of_mutations()
         mutated_id = self.id
@@ -98,13 +99,11 @@ class GeneticTree:
                         self.__initial_iteration = self.iteration
                         if score_better_than_children:
                             self.children = [new_tree]
-                        else:
+                        elif len(self.children) < max_number_of_children:
                             self.children.append(new_tree)
                         return new_tree, True
-                elif len(self.children) <= 0:
+                elif len(self.children) <= 0 and child:
                     self.__initial_iteration = self.iteration
-                    # This means that we are a child that has founded an id equal than him. We must returned for
-                    # the father to added to his list of children.
                     return new_tree, False
         return self, False
 

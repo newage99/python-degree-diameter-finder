@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 from misc.config import save_results_frequency
+from misc.config import max_number_of_children
 from misc.ResultsManager import ResultsManager
 from genetic_manager.GeneticTree import GeneticTree
 from topology_manager.IdGenerator import IdGenerator
@@ -54,6 +55,7 @@ class GeneticTreeManager:
 
         for i in range(GeneticTreeManager.number_of_iterations, final_number_of_iterations):
             print("Iteration " + str(i) + "/" + str(final_number_of_iterations - 1) + "...")
+            sys.stdout.flush()
             for j in range(len(GeneticTreeManager.trees)):
                 tree = GeneticTreeManager.trees[j]
                 no_child_mutated = True
@@ -72,13 +74,13 @@ class GeneticTreeManager:
                             else:
                                 child_mutated_to_equal_pair = [child, new_tree]
                 if no_child_mutated:
-                    if child_mutated_to_equal_pair:
+                    if child_mutated_to_equal_pair and len(tree.children) < max_number_of_children:
                         GeneticTreeManager.print_successful_mutation("Child (E)", child_mutated_to_equal_pair[0],
                                                                      child_mutated_to_equal_pair[1], j)
                         sys.stdout.flush()
                         GeneticTreeManager.trees[j].children.append(child_mutated_to_equal_pair[1])
                     else:
-                        new_tree, is_better_than_child = tree.mutate()
+                        new_tree, is_better_than_child = tree.mutate(False)
                         # In this case, is_better_than_child variable does not represent anything,
                         # given we are not a child but the father
                         if new_tree != tree:

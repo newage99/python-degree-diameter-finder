@@ -64,6 +64,41 @@ class RunCommand(Command):
         return iterations
 
     @staticmethod
+    def load_tree_list(i, values):
+        trees_list = []
+        invalid_argument_pos_and_reason = None
+        if len(values) < 2 or len(values[1]) <= 0:
+            invalid_argument_pos_and_reason = [i, "Load file name not provided."]
+        else:
+            results_file, error_reason = ResultsManager.read_results(values[1])
+            if error_reason:
+                invalid_argument_pos_and_reason = [i, error_reason]
+            else:
+                GeneticTreeManager.results_file_name = values[1]
+                try:
+                    trees_dict_list = json.loads(results_file)
+                    for tree_dict in trees_dict_list:
+                        trees_list.append(GeneticTree.from_dict(tree_dict))
+                except Exception as e:
+                    invalid_argument_pos_and_reason = [i, "Error parsing results json: " + str(e)]
+        return trees_list, invalid_argument_pos_and_reason
+
+    @staticmethod
+    def retrieve_number_of_trees(i, values):
+        n_trees = number_of_trees
+        invalid_argument_pos_and_reason = None
+        if len(values) < 2 or len(values[1]) <= 0:
+            invalid_argument_pos_and_reason = [i, "Number of trees not provided"]
+        else:
+            try:
+                n_trees = int(values[1])
+                if n_trees <= 0:
+                    invalid_argument_pos_and_reason = [i, "Number of trees is not a positive integer"]
+            except Exception as e:
+                invalid_argument_pos_and_reason = [i, "Number of trees is not an integer"]
+        return n_trees, invalid_argument_pos_and_reason
+
+    @staticmethod
     def execute(arguments):
         iterations = RunCommand.retrieve_iterations(arguments)
         if iterations > 0:
@@ -71,48 +106,22 @@ class RunCommand(Command):
             invalid_argument_pos_and_reason = None
             n_trees = number_of_trees
             if len(arguments) > 1:
-                save_file_name = None
                 for i in range(1, len(arguments)):
                     arg = arguments[i]
                     if arg.startswith('--load='):
-                        values = arg.split("=")
-                        if len(values) < 2 or len(values[1]) <= 0:
-                            invalid_argument_pos_and_reason = [i, "Load file name not provided."]
-                        else:
-                            results_file, error_reason = ResultsManager.read_results(values[1])
-                            if error_reason:
-                                invalid_argument_pos_and_reason = [i, error_reason]
-                            else:
-                                GeneticTreeManager.results_file_name = values[1]
-                                try:
-                                    trees_dict_list = json.loads(results_file)
-                                    for tree_dict in trees_dict_list:
-                                        trees_list.append(GeneticTree.from_dict(tree_dict))
-                                except Exception as e:
-                                    invalid_argument_pos_and_reason = [i, "Error parsing results json: " + str(e)]
+                        trees_list, invalid_argument_pos_and_reason = RunCommand.load_tree_list(i, arg.split("="))
                     elif arg.startswith('--save='):
                         values = arg.split("=")
                         if len(values) < 2 or len(values[1]) <= 0:
                             invalid_argument_pos_and_reason = [i, "Read file name not provided"]
                         else:
-                            save_file_name = values[1]
+                            GeneticTreeManager.results_file_name = values[1]
                     elif arg.startswith('--ntrees='):
-                        values = arg.split("=")
-                        if len(values) < 2 or len(values[1]) <= 0:
-                            invalid_argument_pos_and_reason = [i, "Number of trees not provided"]
-                        else:
-                            try:
-                                n_trees = int(values[1])
-                                if n_trees <= 0:
-                                    invalid_argument_pos_and_reason = [i, "Number of trees is not a positive integer"]
-                            except Exception as e:
-                                invalid_argument_pos_and_reason = [i, "Number of trees is not an integer"]
+                        n_trees = RunCommand.retrieve_number_of_trees(i, arg.split("="))
                     else:
                         invalid_argument_pos_and_reason = [i, "Argument not recognized."]
                     if invalid_argument_pos_and_reason:
                         break
-                if save_file_name:
-                    GeneticTreeManager.results_file_name = save_file_name
             if invalid_argument_pos_and_reason:
                 pos = invalid_argument_pos_and_reason[0]
                 reason = invalid_argument_pos_and_reason[1]
