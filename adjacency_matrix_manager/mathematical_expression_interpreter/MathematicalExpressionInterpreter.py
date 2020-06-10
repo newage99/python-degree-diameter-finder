@@ -164,8 +164,11 @@ class ExpressionInterpreter(unittest.TestCase):
                     c = self.char_to_symbol[c]
                 if c == Symbol.OpenParenthesis:
                     self.numbers.append([])
-                elif c == Symbol.CloseParenthesis and self.__count() == 1:
-                    self.__push(self.numbers.pop()[0])
+                elif c == Symbol.CloseParenthesis:
+                    if self.__count() == 1:
+                        self.__push(self.numbers.pop()[0])
+                    else:
+                        raise Exception
                 elif c in self.char_to_symbol.values():
                     self.operations.append(c)
                 else:
