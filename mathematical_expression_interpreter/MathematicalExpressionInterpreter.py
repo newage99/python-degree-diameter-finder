@@ -1,5 +1,5 @@
-from adjacency_matrix_manager.mathematical_expression_interpreter.Symbol import Symbol
-from adjacency_matrix_manager.mathematical_expression_interpreter.Result import Result
+from mathematical_expression_interpreter.Symbol import Symbol
+from mathematical_expression_interpreter.Result import Result
 from math import log, pow
 import unittest
 from misc.global_variables import operators

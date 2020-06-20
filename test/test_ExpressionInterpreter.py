@@ -1,5 +1,5 @@
 import unittest
-from adjacency_matrix_manager.mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
+from mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
 
 
 class ExpressionInterpreterTest(unittest.TestCase):

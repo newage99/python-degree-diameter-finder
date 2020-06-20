@@ -1,4 +1,4 @@
-from adjacency_matrix_manager.mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
+from mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
 from misc.config import number_of_nodes
 from topology_manager.IdGenerator import IdGenerator
 import networkx
