@@ -1,9 +1,9 @@
 import json
 import sys
 from commands.Command import Command
-from genetic_manager.GeneticTreeManager import GeneticTreeManager
-from genetic_manager.GeneticTree import GeneticTree
-from topology_manager.ResultsManager import ResultsManager
+from GeneticTreeManager import GeneticTreeManager
+from GeneticTree import GeneticTree
+from ResultsManager import ResultsManager
 from misc.config import number_of_trees
 
 

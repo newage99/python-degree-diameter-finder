@@ -1,6 +1,6 @@
 import unittest
-from topology_manager.IdGenerator import IdGenerator
-from topology_manager.IdMutator import IdMutator
+from IdGenerator import IdGenerator
+from IdMutator import IdMutator
 from misc.global_variables import *
 
 

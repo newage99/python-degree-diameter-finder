@@ -2,9 +2,9 @@ import sys
 from datetime import datetime
 from misc.config import save_results_frequency
 from misc.config import max_number_of_children
-from topology_manager.ResultsManager import ResultsManager
-from genetic_manager.GeneticTree import GeneticTree
-from topology_manager.IdGenerator import IdGenerator
+from ResultsManager import ResultsManager
+from GeneticTree import GeneticTree
+from IdGenerator import IdGenerator
 
 
 class GeneticTreeManager:

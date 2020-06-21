@@ -1,8 +1,8 @@
 import math
 from misc.config import max_number_of_children
-from topology_manager.IdMutator import IdMutator
-from score.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
-from topology_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from IdMutator import IdMutator
+from DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
+from AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 
 
 class GeneticTree:

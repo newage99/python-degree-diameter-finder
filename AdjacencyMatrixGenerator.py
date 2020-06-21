@@ -1,6 +1,6 @@
-from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
+from ExpressionInterpreter import ExpressionInterpreter
 from misc.config import number_of_nodes
-from topology_manager.IdGenerator import IdGenerator
+from IdGenerator import IdGenerator
 import networkx
 
 

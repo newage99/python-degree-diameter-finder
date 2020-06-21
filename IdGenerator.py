@@ -64,6 +64,6 @@ class IdGenerator:
         connected = False
         while not connected:
             id = IdGenerator.generate_id()
-            from topology_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+            from AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
         return id

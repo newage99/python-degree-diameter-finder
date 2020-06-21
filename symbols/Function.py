@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
+from ExpressionInterpreter import ExpressionInterpreter
 from symbols.Symbol import Symbol
 
 
@@ -10,10 +10,11 @@ class Function(Symbol):
     def get_number_of_args():
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_arguments():
-        pass
+    def get_arguments(self):
+        args = []
+        for i in range(self.get_number_of_args()):
+            args.insert(0, ExpressionInterpreter.pop_number())
+        return args
 
     @abstractmethod
     def compute(self, args):

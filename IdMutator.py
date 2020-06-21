@@ -1,4 +1,4 @@
-from topology_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
 from misc.Random import *
 
