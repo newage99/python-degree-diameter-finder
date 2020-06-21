@@ -27,15 +27,15 @@ class ExpressionInterpreter(unittest.TestCase):
     # --------------------- #
 
     @staticmethod
-    def __get_symbol(char, prev_char):
+    def __get_symbol(char, prev_number_or_symbol):
         if char in ExpressionInterpreter.symbols:
             for symbol in ExpressionInterpreter.symbols[char]:
-                if symbol.check_symbol(char, prev_char):
+                if symbol.check_symbol(char, prev_number_or_symbol):
                     return symbol
         raise Exception
 
     @staticmethod
-    def __get_next_number_or_symbol(prev_char):
+    def __get_next_number_or_symbol(prev_number_or_symbol):
         expression = ExpressionInterpreter.expression
         if ExpressionInterpreter.pos >= len(expression):
             return None, None
@@ -47,11 +47,12 @@ class ExpressionInterpreter(unittest.TestCase):
                 ExpressionInterpreter.pos += 1
             number_or_symbol = int(char)
         else:
-            number_or_symbol = ExpressionInterpreter.__get_symbol(char, prev_char)
+            number_or_symbol = ExpressionInterpreter.__get_symbol(char, prev_number_or_symbol)
         return char, number_or_symbol
 
     @staticmethod
     def __fill_symbols_dict():
+        ExpressionInterpreter.symbols = {}
         excludes = ["Symbol.py", "Function.py", "Operator.py", "SingleArgFunction.py"]
         command_folder_files = [f for f in listdir("../symbols") if isfile(join("../symbols", f)) and f not in excludes]
         for file in command_folder_files:
@@ -66,6 +67,17 @@ class ExpressionInterpreter(unittest.TestCase):
                     ExpressionInterpreter.symbols[symbol].append(obj)
                 else:
                     ExpressionInterpreter.symbols[symbol] = [obj]
+
+    @staticmethod
+    def __compute_if_needed():
+        last_functions = ExpressionInterpreter.functions[-1]
+        while len(last_functions) > 0:
+            function = last_functions[-1]
+            if function.is_ready_to_compute():
+                ExpressionInterpreter.push_number(function.compute(function.get_arguments()))
+                last_functions.pop()
+            else:
+                break
 
     # --------------------------- #
     # -- PUBLIC STATIC METHODS -- #
@@ -90,20 +102,20 @@ class ExpressionInterpreter(unittest.TestCase):
         ExpressionInterpreter.numbers.append([])
         ExpressionInterpreter.pos = 0
         ExpressionInterpreter.functions = []
+        ExpressionInterpreter.functions.append([])
         ExpressionInterpreter.__fill_symbols_dict()
         try:
             char, number_or_symbol = ExpressionInterpreter.__get_next_number_or_symbol("")
             while char:
                 if type(number_or_symbol) is int:
                     ExpressionInterpreter.push_number(number_or_symbol)
+                    ExpressionInterpreter.__compute_if_needed()
                 else:
                     number_or_symbol.process()
-                if len(ExpressionInterpreter.functions) > 0:
-                    function = ExpressionInterpreter.functions[-1]
-                    if function.is_ready_to_compute():
-                        ExpressionInterpreter.push_number(function.compute(function.get_arguments()))
-                        ExpressionInterpreter.functions.pop()
-                char, number_or_symbol = ExpressionInterpreter.__get_next_number_or_symbol(char)
+                    if char == ')':
+                        ExpressionInterpreter.__compute_if_needed()
+                # ExpressionInterpreter.__compute_if_needed()
+                char, number_or_symbol = ExpressionInterpreter.__get_next_number_or_symbol(number_or_symbol)
         except Exception as e:
             return 0
         return ExpressionInterpreter.numbers[0][0]

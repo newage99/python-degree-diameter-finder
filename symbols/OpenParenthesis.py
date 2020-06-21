@@ -10,3 +10,4 @@ class OpenParenthesis(Symbol):
 
     def process(self):
         ExpressionInterpreter.numbers.append([])
+        ExpressionInterpreter.functions.append([])

@@ -11,5 +11,6 @@ class CloseParenthesis(Symbol):
     def process(self):
         if ExpressionInterpreter.numbers_count() == 1:
             ExpressionInterpreter.push_number(ExpressionInterpreter.numbers.pop()[0])
+            ExpressionInterpreter.functions.pop()
         else:
             raise Exception

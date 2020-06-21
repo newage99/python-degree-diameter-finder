@@ -12,9 +12,14 @@ class Symbol(ABC):
     def process(self):
         pass
 
-    def check_symbol(self, char, prev_char):
+    def check_symbol(self, char, prev_number_or_symbol):
         return char == self.symbol()
 
-    # Used on check_symbol functions in order to not having to differentiate between int variables and Symbol objects.
+    """
+    Used on:
+    check_symbol function implementations to not have to differentiate between int variables and Symbol objects.
+    Subtraction has_valid_prev_char function to not have to differentiate between int variables and Symbol objects.
+    """
+    # Used on
     def __str__(self):
         return self.symbol()

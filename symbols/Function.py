@@ -21,7 +21,7 @@ class Function(Symbol):
         pass
 
     def is_ready_to_compute(self):
-        return ExpressionInterpreter.numbers_count() == self.get_number_of_args()
+        return ExpressionInterpreter.numbers_count() >= self.get_number_of_args()
 
     def process(self):
-        ExpressionInterpreter.functions.append(self)
+        ExpressionInterpreter.functions[-1].append(self)
