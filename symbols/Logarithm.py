@@ -4,7 +4,8 @@ from symbols.Operator import Operator
 
 class Logarithm(Operator):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "L"
 
     def compute(self, args):

@@ -1,9 +1,10 @@
 from symbols.Operator import Operator
 
 
-class Addition(Operator):
+class Multiplication(Operator):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "*"
 
     def compute(self, args):

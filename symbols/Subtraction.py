@@ -3,7 +3,8 @@ from symbols.Operator import Operator
 
 class Subtraction(Operator):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "-"
 
     def check_symbol(self, char, prev_char):

@@ -2,9 +2,10 @@ from symbols.SingleArgFunction import SingleArgFunction
 from symbols.Operator import Operator
 
 
-class Negate(SingleArgFunction):
+class Negation(SingleArgFunction):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "-"
 
     def check_symbol(self, char, prev_char):

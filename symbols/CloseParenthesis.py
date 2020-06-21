@@ -4,7 +4,8 @@ from main.ExpressionInterpreter import ExpressionInterpreter
 
 class CloseParenthesis(Symbol):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return ")"
 
     def process(self):

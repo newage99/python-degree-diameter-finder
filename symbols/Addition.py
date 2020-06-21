@@ -3,7 +3,8 @@ from symbols.Operator import Operator
 
 class Addition(Operator):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "+"
 
     def compute(self, args):

@@ -4,7 +4,8 @@ from symbols.Operator import Operator
 
 class Exponential(Operator):
 
-    def symbol(self):
+    @staticmethod
+    def symbol():
         return "^"
 
     def compute(self, args):

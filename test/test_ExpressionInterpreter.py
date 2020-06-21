@@ -8,16 +8,13 @@ class ExpressionInterpreterTest(unittest.TestCase):
 
         compute = ExpressionInterpreter.compute
 
-        # OPERATOR TESTS
+        # Addition
         self.assertEqual(compute("1+1"), 2)
-        self.assertEqual(compute("1-1"), 0)
-        self.assertEqual(compute("2*7"), 14)
-        self.assertEqual(compute("6/2"), 3)
-        self.assertEqual(compute("4%2"), 0)
+        self.assertEqual(compute("100+(100+34)"), 234)
+        self.assertEqual(compute("(3+14)+(3+4)"), 24)
+        self.assertEqual(compute("1+2+(3+4+(5+(6+7)+8))+9"), 45)
 
-        # FUNCTION TESTS
-        self.assertEqual(compute("-3"), -3)
-        self.assertEqual(compute("-(5)"), -5)
+        # TODO
 
 
 if __name__ == "__main__":

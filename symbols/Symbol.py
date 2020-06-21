@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 
 class Symbol(ABC):
 
+    @staticmethod
     @abstractmethod
-    def symbol(self):
+    def symbol():
         pass
 
     @abstractmethod
