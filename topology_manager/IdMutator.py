@@ -1,6 +1,5 @@
-from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from topology_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
-from misc.global_variables import characters, operators, variables_and_numbers
 from misc.Random import *
 
 

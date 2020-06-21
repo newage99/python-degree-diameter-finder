@@ -1,5 +1,5 @@
 import unittest
-from adjacency_matrix_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from topology_manager.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 
 
 class AdjacencyMatrixGeneratorTest(unittest.TestCase):
