@@ -1,5 +1,5 @@
 from symbols.Symbol import Symbol
-from ExpressionInterpreter import ExpressionInterpreter
+from main.ExpressionInterpreter import ExpressionInterpreter
 
 
 class OpenParenthesis(Symbol):

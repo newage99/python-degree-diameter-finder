@@ -48,7 +48,7 @@ class ExpressionInterpreter(unittest.TestCase):
     def __fill_symbols_list():
         symbol_list = []
         exclude_list = ["Symbol.py", "Function.py", "Operator.py", "SingleArgFunction.py"]
-        command_folder_files = [f for f in listdir("symbols") if isfile(join("symbols", f)) and f not in exclude_list]
+        command_folder_files = [f for f in listdir("../symbols") if isfile(join("../symbols", f)) and f not in exclude_list]
         for file in command_folder_files:
             spec = importlib.util.spec_from_file_location("", "symbols/" + file)
             foo = importlib.util.module_from_spec(spec)

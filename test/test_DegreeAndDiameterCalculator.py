@@ -1,5 +1,5 @@
 import unittest
-from DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
+from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 
 
 class DegreeAndDiameterCalculatorTest(unittest.TestCase):

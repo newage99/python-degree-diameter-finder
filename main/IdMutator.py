@@ -1,4 +1,4 @@
-from AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
 from misc.Random import *
 

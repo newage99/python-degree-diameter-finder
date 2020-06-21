@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from ExpressionInterpreter import ExpressionInterpreter
+from main.ExpressionInterpreter import ExpressionInterpreter
 from symbols.Symbol import Symbol
 
 

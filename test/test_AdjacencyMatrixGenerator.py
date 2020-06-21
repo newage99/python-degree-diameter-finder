@@ -1,5 +1,5 @@
 import unittest
-from AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 
 
 class AdjacencyMatrixGeneratorTest(unittest.TestCase):

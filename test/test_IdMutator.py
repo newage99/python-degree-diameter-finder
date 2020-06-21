@@ -1,6 +1,6 @@
 import unittest
-from IdGenerator import IdGenerator
-from IdMutator import IdMutator
+from main.IdGenerator import IdGenerator
+from main.IdMutator import IdMutator
 from misc.global_variables import *
 
 
