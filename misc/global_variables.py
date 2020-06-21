@@ -1,13 +1,13 @@
 variables = ["x", "y", "n"]
 numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-numbers_array = variables + numbers
-xyn_array = numbers_array + ["("]
+variables_and_numbers = variables + numbers
+vars_numbers_and_open_parenthesis = variables_and_numbers + ["("]
 plus_minus_array = ["+", "-", "*", "/", "^", "L", "%", ")"]
 operators_array = ["+", "*", "/", "%", ")", "^", "L"]
 forbidden_right_chars = {
-    "x": xyn_array,
-    "y": xyn_array,
-    "n": xyn_array,
+    "x": vars_numbers_and_open_parenthesis,
+    "y": vars_numbers_and_open_parenthesis,
+    "n": vars_numbers_and_open_parenthesis,
     "+": plus_minus_array,
     "-": plus_minus_array,
     "*": operators_array,
@@ -16,26 +16,25 @@ forbidden_right_chars = {
     "^": operators_array,
     "L": operators_array,
     "(": ["+", "*", "/", "%", ")", "^", "L"],
-    ")": numbers_array,
-    "0": numbers_array,
-    "1": numbers_array,
-    "2": numbers_array,
-    "3": numbers_array,
-    "4": numbers_array,
-    "5": numbers_array,
-    "6": numbers_array,
-    "7": numbers_array,
-    "8": numbers_array,
-    "9": numbers_array
+    ")": variables_and_numbers,
+    "0": variables_and_numbers,
+    "1": variables_and_numbers,
+    "2": variables_and_numbers,
+    "3": variables_and_numbers,
+    "4": variables_and_numbers,
+    "5": variables_and_numbers,
+    "6": variables_and_numbers,
+    "7": variables_and_numbers,
+    "8": variables_and_numbers,
+    "9": variables_and_numbers
 }
-array_left = variables + [")"] + numbers
-xyn_array_left = variables + [")"] + numbers
+vars_numbers_and_close_parenthesis = variables_and_numbers + [")"]
 operators_array_left = ["+", "-", "*", "/", "%", "^", "L", "("]
 sum_close_parenthesis_left = ["+", "-", "*", "/", "%", "^", "L", "("]
 forbidden_left_chars = {
-    "x": array_left,
-    "y": array_left,
-    "n": array_left,
+    "x": vars_numbers_and_close_parenthesis,
+    "y": vars_numbers_and_close_parenthesis,
+    "n": vars_numbers_and_close_parenthesis,
     "+": sum_close_parenthesis_left,
     "-": ["+", "-"],
     "*": operators_array_left,
@@ -43,18 +42,18 @@ forbidden_left_chars = {
     "%": operators_array_left,
     "^": operators_array_left,
     "L": operators_array_left,
-    "(": array_left,
+    "(": vars_numbers_and_close_parenthesis,
     ")": sum_close_parenthesis_left,
-    "0": array_left,
-    "1": array_left,
-    "2": array_left,
-    "3": array_left,
-    "4": array_left,
-    "5": array_left,
-    "6": array_left,
-    "7": array_left,
-    "8": array_left,
-    "9": array_left
+    "0": vars_numbers_and_close_parenthesis,
+    "1": vars_numbers_and_close_parenthesis,
+    "2": vars_numbers_and_close_parenthesis,
+    "3": vars_numbers_and_close_parenthesis,
+    "4": vars_numbers_and_close_parenthesis,
+    "5": vars_numbers_and_close_parenthesis,
+    "6": vars_numbers_and_close_parenthesis,
+    "7": vars_numbers_and_close_parenthesis,
+    "8": vars_numbers_and_close_parenthesis,
+    "9": vars_numbers_and_close_parenthesis
 }
 operators = "+-*/%^L"
 characters = operators + "()xyn12"

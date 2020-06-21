@@ -1,5 +1,5 @@
 import unittest
-from mathematical_expression_interpreter.MathematicalExpressionInterpreter import ExpressionInterpreter
+from expression_interpreter.ExpressionInterpreter import ExpressionInterpreter
 
 
 class ExpressionInterpreterTest(unittest.TestCase):
