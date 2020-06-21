@@ -9,6 +9,6 @@ class Logarithm(Operator):
         return "L"
 
     def compute(self, args):
-        if args[1] == 0:
+        if args[0] == 0 or args[1] == 0:
             raise ValueError
         return log(args[1], args[0])

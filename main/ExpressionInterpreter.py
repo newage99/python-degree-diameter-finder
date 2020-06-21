@@ -114,7 +114,6 @@ class ExpressionInterpreter(unittest.TestCase):
                     number_or_symbol.process()
                     if char == ')':
                         ExpressionInterpreter.__compute_if_needed()
-                # ExpressionInterpreter.__compute_if_needed()
                 char, number_or_symbol = ExpressionInterpreter.__get_next_number_or_symbol(number_or_symbol)
         except Exception as e:
             return 0
