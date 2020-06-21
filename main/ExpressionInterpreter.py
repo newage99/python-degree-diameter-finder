@@ -54,11 +54,25 @@ class ExpressionInterpreter(unittest.TestCase):
     def __fill_symbols_dict():
         ExpressionInterpreter.symbols = {}
         excludes = ["Symbol.py", "Function.py", "Operator.py", "SingleArgFunction.py"]
-        command_folder_files = [f for f in listdir("../symbols") if isfile(join("../symbols", f)) and f not in excludes]
+        command_folder_files = None
+        symbols_folder_locations = ["symbols", "../symbols"]
+        for dir in symbols_folder_locations:
+            try:
+                command_folder_files = [f for f in listdir(dir) if isfile(join(dir, f)) and f not in excludes]
+                break
+            except Exception as e:
+                pass
+        symbols_folder_locations = ["symbols/", "./../symbols/"]
         for file in command_folder_files:
-            spec = importlib.util.spec_from_file_location("", "./../symbols/" + file)
-            foo = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(foo)
+            foo = None
+            for dir in symbols_folder_locations:
+                try:
+                    spec = importlib.util.spec_from_file_location("", dir + file)
+                    foo = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(foo)
+                    break
+                except Exception as e:
+                    pass
             klass = getattr(foo, file.replace(".py", ""))
             if issubclass(klass, Symbol):
                 obj = klass()

@@ -4,9 +4,7 @@ from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 
 class DegreeAndDiameterCalculatorTest(unittest.TestCase):
 
-    # calculate = DegreeAndDiameterCalculator.calculate
-
-    # Custom matrix in order to better test the functions:
+    # Custom matrix in order test better the functions:
     #
     #      1---2-----5
     #     /     \    |
@@ -74,7 +72,7 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
 
         # On square matrix, the shortest path between opposite nodes should be length=2
         self.check_paths_list(square, [[0, 2], [1, 3]], 2)
-        # and adjacent nodes length=1
+        # and length=1 on adjacent nodes
         self.check_paths_list(square, [[0, 1], [0, 3], [1, 2], [2, 3]], 1)
 
         # On the custom matrix, we first we check adjacent nodes...
@@ -95,10 +93,6 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
         self.assertEqual(calculate(matrix), [size - 1, 1, (size-1) * triangular_size, triangular_size])
 
     def test_calculate(self):
-
-        self.check_calculate_on_fully_connected_matrix(4)
-        self.check_calculate_on_fully_connected_matrix(9)
-        self.check_calculate_on_fully_connected_matrix(11)
 
         total_diameter = len(self.custom_distance_1_pairs) + (len(self.custom_distance_2_pairs) * 2) + (
                     len(self.custom_distance_3_pairs) * 3) + (len(self.custom_distance_4_pairs) * 4) + 5
