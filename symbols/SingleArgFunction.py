@@ -1,13 +1,24 @@
 from symbols.Function import Function
-from abc import abstractmethod
 
 
 class SingleArgFunction(Function):
 
     @staticmethod
+    def symbol():
+        raise NotImplementedError
+
+    @staticmethod
+    def forbidden_prev_symbol(symbol):
+        raise NotImplementedError
+
+    @staticmethod
+    def forbidden_next_symbol(symbol):
+        raise NotImplementedError
+
+    @staticmethod
     def get_number_of_args():
         return 1
 
-    @abstractmethod
-    def compute(self, args):
-        pass
+    @staticmethod
+    def compute(args):
+        raise NotImplementedError

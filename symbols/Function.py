@@ -1,27 +1,29 @@
+from symbols.InterpretableSymbol import InterpretableSymbol
+import misc.globals as globals
+
 from abc import abstractmethod
-from main.ExpressionInterpreter import ExpressionInterpreter
-from symbols.Symbol import Symbol
 
 
-class Function(Symbol):
+class Function(InterpretableSymbol):
 
     @staticmethod
     @abstractmethod
     def get_number_of_args():
         pass
 
+    @staticmethod
+    @abstractmethod
+    def compute(args):
+        pass
+
+    def interpret(self):
+        globals.functions[-1].append(self)
+
     def get_arguments(self):
         args = []
         for i in range(self.get_number_of_args()):
-            args.insert(0, ExpressionInterpreter.pop_number())
+            args.insert(0, globals.pop_number())
         return args
 
-    @abstractmethod
-    def compute(self, args):
-        pass
-
     def is_ready_to_compute(self):
-        return ExpressionInterpreter.numbers_count() >= self.get_number_of_args()
-
-    def process(self):
-        ExpressionInterpreter.functions[-1].append(self)
+        return globals.numbers_count() >= self.get_number_of_args()

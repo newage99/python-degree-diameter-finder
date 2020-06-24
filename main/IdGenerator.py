@@ -1,5 +1,6 @@
-from misc.Random import *
 from misc.config import wanted_length
+from symbols.Operator import Operator
+from symbols.Symbol import Symbol
 
 
 class IdGenerator:
@@ -33,29 +34,39 @@ class IdGenerator:
 
     @staticmethod
     def generate_id(length=wanted_length):
-        new_id, is_open_parenthesis, is_close_parenthesis = random_char()
+        symbols_raw = Symbol.symbols_dict()
+        symbols = {}
+        for symbol in symbols_raw:
+            symbols[symbol] = symbols_raw[symbol][0]
+        new_id, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+        new_id_symbols = [symbols[new_id]]
         parenthesis_counter = 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
-        while new_id in plus_minus_array:
-            new_id, is_open_parenthesis, is_close_parenthesis = random_char()
+        while new_id in Operator.operators() or new_id == ")":
+            new_id, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+            new_id_symbols = [symbols[new_id]]
             parenthesis_counter = 1 if is_open_parenthesis else 0
-        while len(new_id) < length or new_id[-1] in operators_array_left:
-            new_c, is_open_parenthesis, is_close_parenthesis = random_char()
-            while new_id[-1] in forbidden_left_chars[new_c] or (
+        while len(new_id) < length or new_id[-1] in Operator.operators() or new_id[-1] == "(":
+            new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+            while symbols[new_c].forbidden_prev_symbol(new_id_symbols[-1]) or (
                     is_close_parenthesis and not IdGenerator.__valid_close_parenthesis(new_id,
                                                                                        parenthesis_counter)) or (
                     is_open_parenthesis and not IdGenerator.__valid_open_parenthesis(new_id, parenthesis_counter,
                                                                                      length)):
-                new_c, is_open_parenthesis, is_close_parenthesis = random_char()
+                new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
             parenthesis_counter += 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
             new_id += new_c
+            new_id_symbols.append(symbols[new_c])
+        close_parenthesis_symbol = symbols[")"]
         while parenthesis_counter > 0:
-            if new_id[-1] in forbidden_left_chars[")"]:
-                new_c, is_open_parenthesis, is_close_parenthesis = random_char()
-                while new_id[-1] in forbidden_left_chars[new_c] or new_c == "(":
-                    new_c, is_open_parenthesis, is_close_parenthesis = random_char()
+            if close_parenthesis_symbol.forbidden_prev_symbol(new_id_symbols[-1]):
+                new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+                while symbols[new_c].forbidden_prev_symbol(new_id_symbols[-1]) or new_c == "(":
+                    new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
                 new_id += new_c
+                new_id_symbols.append(symbols[new_c])
             else:
                 new_id += ")"
+                new_id_symbols.append(symbols[")"])
                 parenthesis_counter -= 1
         return new_id
 

@@ -1,12 +1,8 @@
-from symbols.OpenParenthesis import OpenParenthesis
+from symbols.Minus import Minus
 from symbols.Operator import Operator
 
 
-class Subtraction(Operator):
-
-    @staticmethod
-    def symbol():
-        return "-"
+class Subtraction(Minus, Operator):
 
     @staticmethod
     def has_valid_prev_char(prev_number_or_symbol):

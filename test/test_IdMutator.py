@@ -1,7 +1,9 @@
 import unittest
+
 from main.IdGenerator import IdGenerator
 from main.IdMutator import IdMutator
-from misc.global_variables import *
+from symbols.Operator import Operator
+from symbols.Symbol import Symbol
 
 
 class IdMutatorTest(unittest.TestCase):
@@ -10,6 +12,10 @@ class IdMutatorTest(unittest.TestCase):
                  check_parenthesis: bool = True):
 
         id_len = len(id)
+        symbols = []
+        for char in id:
+            symbols.append(Symbol.symbols_dict()[char][0])
+        # symbols = Symbol.parse_id(id)
         parenthesis_counter = 0
         for j in range(id_len):
             if id[j] == '(':
@@ -20,9 +26,9 @@ class IdMutatorTest(unittest.TestCase):
                                     "Found close parenthesis when there's no open parenthesis to close.")
                 parenthesis_counter -= 1
             error = ''
-            if j > 0 and id[j - 1] in forbidden_left_chars[id[j]]:
+            if j > 0 and symbols[j].forbidden_prev_symbol(symbols[j - 1]):
                 error = 'L'
-            elif j + 1 < id_len and id[j + 1] in forbidden_right_chars[id[j]]:
+            elif j + 1 < id_len and symbols[j].forbidden_next_symbol(symbols[j + 1]):
                 error = 'R'
             if error != '':
                 print('')
@@ -34,7 +40,7 @@ class IdMutatorTest(unittest.TestCase):
                 self.assertTrue(False)  # We use this assert only to stop the test.
         if check_parenthesis:
             self.assertEqual(parenthesis_counter, 0, "Incorrect number of parenthesis.")
-        self.assertFalse(id[id_len-1] in operators, "Id ends with an invalid character.")
+        self.assertFalse(id[id_len-1] in Operator.operators(), "Id ends with an invalid character.")
 
     def perform_mutation_stress_test(self, check_parenthesis: bool):
 
