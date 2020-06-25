@@ -1,11 +1,11 @@
 import random
 
-from symbols.Symbol import get_symbol_folder_classes
-from symbols.Function import Function
+from misc.globals import get_symbol_classes_that_inherit_from
+from symbols.interpretable_symbol.functions.Function import Function
 
 
 def get_operator_chars():
-    operators = get_symbol_folder_classes("Operator", "symbol")
+    operators = get_symbol_classes_that_inherit_from("Operator", "symbol")
     return ''.join([operators[o][0].symbol() for o in operators])
 
 

@@ -3,7 +3,7 @@ import sys
 import inspect
 
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, isdir, dirname, abspath
 
 expression = ''  # Expression to interpret
 pos = 0          # Actual position of the expression we are processing
@@ -27,49 +27,81 @@ def push_number(a):
     numbers[-1].append(a)
 
 
-def get_classes_that_inherit_from(class_they_inherit_from, folder):
-    classes = []
-    command_folder_files = None
-    symbols_folder_locations = [folder, "../" + folder]
-    exceptions = ["Symbol.py", "Function.py", "InterpretableSymbol.py", "Number.py", "Operator.py",
-                  "SingleArgFunction.py", "Variable.py"]
-    for location in symbols_folder_locations:
-        try:
-            command_folder_files = [f for f in listdir(location) if
-                                    isfile(join(location, f)) and f not in exceptions and f.endswith(".py")]
-            break
-        except Exception as e:
-            pass
-    symbols_folder_locations = [folder + "/", "./../" + folder + "/"]
-    inherit_class = None
+def get_relative_path(abs_path: str):
+    folders = str(abs_path).split("/")
+    pos_of_root = folders.index("python-degree-diameter-finder")
+    folders = folders[pos_of_root + 1:]
+    return '/'.join(folders)
+
+
+def __get_class(klass: str, folder: str):
     try:
         modules = sys.modules
-        test = getattr(modules[folder], class_they_inherit_from)
-        members = inspect.getmembers(test)
+        folders = folder.split("/")
+        module = modules[folders[0]]
+        for i in range(1, len(folders)):
+            module = getattr(module, folders[i])
+        file = getattr(module, klass)
+        members = inspect.getmembers(file)
         for member in members:
-            if member[0] == class_they_inherit_from:
-                inherit_class = member[1]
-                break
+            if member[0] == klass:
+                return member[1]
     except Exception as e:
         pass
+    return None
+
+
+def __recursively_get_files(folder: str, exceptions: list):
+    files = []
+    for f in listdir(folder):
+        path = join(folder, f)
+        if isdir(path):
+            files = files + __recursively_get_files(join(folder, f), exceptions)
+        elif isfile(path) and f.endswith(".py") and f not in exceptions:
+            files.append(path)
+    return files
+
+
+def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_implement_name: str):
+
+    folder = get_relative_path(dirname(abspath((inspect.stack()[1])[1])))
+    classes = {}
+    inherit_class = __get_class(class_they_inherit_from, folder)
+
     if inherit_class:
-        klass = None
-        obj = None
-        try:
-            for file in command_folder_files:
-                foo = None
-                for location in symbols_folder_locations:
-                    try:
-                        spec = importlib.util.spec_from_file_location("", location + file)
-                        foo = importlib.util.module_from_spec(spec)
-                        spec.loader.exec_module(foo)
-                        break
-                    except Exception as e:
-                        pass
-                klass = getattr(foo, file.replace(".py", ""))
-                obj = klass()
-                if issubclass(klass, inherit_class):
-                    classes.append(obj)
-        except Exception as e:
-            pass
+
+        symbols_folder_locations = [folder, "../" + folder]
+        location = None
+        for possible_location in symbols_folder_locations:
+            if isdir(possible_location):
+                location = possible_location
+                break
+        if location:
+            exceptions = ["Symbol.py", "Function.py", "InterpretableSymbol.py", "Number.py", "Operator.py",
+                          "SingleArgFunction.py", "Variable.py"]
+            paths = __recursively_get_files(location, exceptions)
+            symbols_folder_locations = ["", "./../"]
+            klass = None
+            obj = None
+            try:
+                for path in paths:
+                    foo = None
+                    for location in symbols_folder_locations:
+                        try:
+                            spec = importlib.util.spec_from_file_location("", location + path)
+                            foo = importlib.util.module_from_spec(spec)
+                            spec.loader.exec_module(foo)
+                            break
+                        except Exception as e:
+                            pass
+                    klass = getattr(foo, str(path.split("/")[-1]).replace(".py", ""))
+                    obj = klass()
+                    if issubclass(klass, inherit_class) and callable(getattr(obj, function_they_implement_name, None)):
+                        class_str = str(obj)
+                        if class_str in classes:
+                            classes[class_str].append(obj)
+                        else:
+                            classes[class_str] = [obj]
+            except Exception as e:
+                pass
     return classes

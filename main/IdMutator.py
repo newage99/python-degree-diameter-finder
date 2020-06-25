@@ -1,10 +1,10 @@
 from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
 from misc.Random import *
-from symbols.Number import Number
-from symbols.Operator import Operator
+from symbols.numbers.Number import Number
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 from symbols.Symbol import Symbol
-from symbols.Variable import Variable
+from symbols.variables.Variable import Variable
 
 
 variables_and_numbers = Number.numbers() + Variable.variables()

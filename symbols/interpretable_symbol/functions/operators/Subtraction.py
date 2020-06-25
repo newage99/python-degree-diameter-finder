@@ -1,5 +1,5 @@
 from symbols.Minus import Minus
-from symbols.Operator import Operator
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 
 
 class Subtraction(Minus, Operator):

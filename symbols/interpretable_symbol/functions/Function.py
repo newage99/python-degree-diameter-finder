@@ -1,4 +1,4 @@
-from symbols.InterpretableSymbol import InterpretableSymbol
+from symbols.interpretable_symbol.InterpretableSymbol import InterpretableSymbol
 import misc.globals as globals
 
 from abc import abstractmethod

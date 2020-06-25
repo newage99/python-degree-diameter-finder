@@ -1,4 +1,4 @@
-from symbols.Number import Number
+from symbols.numbers.Number import Number
 
 
 class One(Number):

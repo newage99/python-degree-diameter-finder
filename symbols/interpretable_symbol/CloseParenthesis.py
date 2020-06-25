@@ -1,9 +1,9 @@
 import misc.globals as globals
 
-from symbols.InterpretableSymbol import InterpretableSymbol
-from symbols.Number import Number
-from symbols.Operator import Operator
-from symbols.Variable import Variable
+from symbols.interpretable_symbol.InterpretableSymbol import InterpretableSymbol
+from symbols.numbers.Number import Number
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
+from symbols.variables.Variable import Variable
 
 
 class CloseParenthesis(InterpretableSymbol):

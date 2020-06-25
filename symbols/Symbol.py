@@ -1,29 +1,7 @@
 import random
 
 from abc import ABC, abstractmethod
-from misc.globals import get_classes_that_inherit_from
-
-
-def get_symbol_folder_classes(class_they_inherit_from, function_they_implement_name: str):
-    symbols = {}
-    classes_that_inherit_from_symbol = None
-    try:
-        classes_that_inherit_from_symbol = get_classes_that_inherit_from(class_they_inherit_from, "symbols")
-    except Exception as e:
-        pass
-    if classes_that_inherit_from_symbol:
-        for obj in classes_that_inherit_from_symbol:
-            if callable(getattr(obj, function_they_implement_name, None)):
-                symbol = obj.symbol()
-                if symbol in symbols:
-                    symbols[symbol].append(obj)
-                else:
-                    symbols[symbol] = [obj]
-        return symbols
-
-
-def get_symbol_classes_that_implement_function(function_name: str = "symbol"):
-    return get_symbol_folder_classes("Symbol", function_name)
+from misc.globals import get_symbol_classes_that_inherit_from
 
 
 class Symbol(ABC):
@@ -33,7 +11,7 @@ class Symbol(ABC):
     @staticmethod
     def symbols_dict():
         if not Symbol.__symbols_dict:
-            Symbol.__symbols_dict = get_symbol_classes_that_implement_function()
+            Symbol.__symbols_dict = get_symbol_classes_that_inherit_from("Symbol", "symbol")
         return Symbol.__symbols_dict
 
     @staticmethod
@@ -58,6 +36,18 @@ class Symbol(ABC):
     def choice():
         new_c = random.choice(list(Symbol.symbols_dict().keys()))
         return new_c, new_c == '(', new_c == ')'
+
+    @staticmethod
+    def parse_id(char: str, prev_number_or_symbol=None):
+        symbols = Symbol.symbols_dict()
+        if char in symbols:
+            for symbol in symbols[char]:
+                try:
+                    if symbol.check_symbol(char, prev_number_or_symbol):
+                        return symbol
+                except Exception as e:
+                    pass
+        return None
 
     """
     Used on:

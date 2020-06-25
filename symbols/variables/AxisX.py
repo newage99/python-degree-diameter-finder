@@ -1,4 +1,4 @@
-from symbols.Variable import Variable
+from symbols.variables.Variable import Variable
 
 
 class AxisX(Variable):

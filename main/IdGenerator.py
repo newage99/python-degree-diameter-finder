@@ -1,5 +1,6 @@
 from misc.config import wanted_length
-from symbols.Operator import Operator
+from symbols.interpretable_symbol.CloseParenthesis import CloseParenthesis
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 from symbols.Symbol import Symbol
 
 
@@ -34,39 +35,40 @@ class IdGenerator:
 
     @staticmethod
     def generate_id(length=wanted_length):
-        symbols_raw = Symbol.symbols_dict()
-        symbols = {}
-        for symbol in symbols_raw:
-            symbols[symbol] = symbols_raw[symbol][0]
+        operators = Operator.operators()
         new_id, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
-        new_id_symbols = [symbols[new_id]]
+        new_id_symbols = [Symbol.parse_id(new_id)]
         parenthesis_counter = 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
-        while new_id in Operator.operators() or new_id == ")":
+        while new_id in operators or new_id == ")":
             new_id, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
-            new_id_symbols = [symbols[new_id]]
+            new_id_symbols = [Symbol.parse_id(new_id)]
             parenthesis_counter = 1 if is_open_parenthesis else 0
-        while len(new_id) < length or new_id[-1] in Operator.operators() or new_id[-1] == "(":
+        while len(new_id) < length or new_id[-1] in operators or new_id[-1] == "(":
             new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
-            while symbols[new_c].forbidden_prev_symbol(new_id_symbols[-1]) or (
+            new_symbol = Symbol.parse_id(new_c, new_id_symbols[-1])
+            while new_symbol.forbidden_prev_symbol(new_id_symbols[-1]) or (
                     is_close_parenthesis and not IdGenerator.__valid_close_parenthesis(new_id,
                                                                                        parenthesis_counter)) or (
                     is_open_parenthesis and not IdGenerator.__valid_open_parenthesis(new_id, parenthesis_counter,
                                                                                      length)):
                 new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+                new_symbol = Symbol.parse_id(new_c, new_id_symbols[-1])
             parenthesis_counter += 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
             new_id += new_c
-            new_id_symbols.append(symbols[new_c])
-        close_parenthesis_symbol = symbols[")"]
+            new_id_symbols.append(new_symbol)
+        close_parenthesis_symbol = CloseParenthesis()
         while parenthesis_counter > 0:
             if close_parenthesis_symbol.forbidden_prev_symbol(new_id_symbols[-1]):
                 new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
-                while symbols[new_c].forbidden_prev_symbol(new_id_symbols[-1]) or new_c == "(":
+                new_symbol = Symbol.parse_id(new_c, new_id_symbols[-1])
+                while new_symbol.forbidden_prev_symbol(new_id_symbols[-1]) or new_c == "(":
                     new_c, is_open_parenthesis, is_close_parenthesis = Symbol.choice()
+                    new_symbol = Symbol.parse_id(new_c, new_id_symbols[-1])
                 new_id += new_c
-                new_id_symbols.append(symbols[new_c])
+                new_id_symbols.append(new_symbol)
             else:
                 new_id += ")"
-                new_id_symbols.append(symbols[")"])
+                new_id_symbols.append(close_parenthesis_symbol)
                 parenthesis_counter -= 1
         return new_id
 

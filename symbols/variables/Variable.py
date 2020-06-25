@@ -1,9 +1,10 @@
-from symbols.Number import Number
-from symbols.Symbol import Symbol, get_symbol_folder_classes
+from misc.globals import get_symbol_classes_that_inherit_from
+from symbols.numbers.Number import Number
+from symbols.Symbol import Symbol
 
 
 def get_variables_chars_list():
-    variables = get_symbol_folder_classes("Variable", "symbol")
+    variables = get_symbol_classes_that_inherit_from("Variable", "symbol")
     return ''.join([variables[o][0].symbol() for o in variables])
 
 

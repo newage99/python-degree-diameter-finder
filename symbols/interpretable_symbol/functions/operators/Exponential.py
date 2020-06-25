@@ -1,5 +1,5 @@
 from math import pow
-from symbols.Operator import Operator
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 
 
 class Exponential(Operator):

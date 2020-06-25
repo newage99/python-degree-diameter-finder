@@ -1,7 +1,7 @@
 import unittest
 
 from main.IdGenerator import IdGenerator
-from symbols.Operator import Operator
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 from symbols.Symbol import Symbol
 
 

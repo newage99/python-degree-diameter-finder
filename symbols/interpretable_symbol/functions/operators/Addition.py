@@ -1,4 +1,4 @@
-from symbols.Operator import Operator
+from symbols.interpretable_symbol.functions.operators.Operator import Operator
 
 
 class Addition(Operator):

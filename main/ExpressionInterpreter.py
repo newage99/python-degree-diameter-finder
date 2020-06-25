@@ -1,5 +1,5 @@
 import misc.globals as globals
-from symbols.InterpretableSymbol import InterpretableSymbol
+from symbols.interpretable_symbol.InterpretableSymbol import InterpretableSymbol
 
 
 class ExpressionInterpreter:

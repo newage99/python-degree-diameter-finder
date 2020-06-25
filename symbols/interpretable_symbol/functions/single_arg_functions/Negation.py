@@ -1,6 +1,6 @@
 from symbols.Minus import Minus
-from symbols.SingleArgFunction import SingleArgFunction
-from symbols.Subtraction import Subtraction
+from symbols.interpretable_symbol.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
+from symbols.interpretable_symbol.functions.operators.Subtraction import Subtraction
 
 
 class Negation(Minus, SingleArgFunction):

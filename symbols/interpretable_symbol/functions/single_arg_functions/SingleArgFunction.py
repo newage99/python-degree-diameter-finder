@@ -1,4 +1,4 @@
-from symbols.Function import Function
+from symbols.interpretable_symbol.functions.Function import Function
 
 
 class SingleArgFunction(Function):
