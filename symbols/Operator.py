@@ -25,7 +25,7 @@ class Operator(Function):
 
     @staticmethod
     def forbidden_prev_symbol(symbol):
-        return isinstance(symbol, Operator) or symbol.symbol() == "("
+        return isinstance(symbol, Operator) or symbol.symbol() == "-" or symbol.symbol() == "("
 
     @staticmethod
     def forbidden_next_symbol(symbol):

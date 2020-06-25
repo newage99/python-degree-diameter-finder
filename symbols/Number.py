@@ -27,10 +27,10 @@ class Number(Symbol):
 
     @staticmethod
     def forbidden_prev_symbol(symbol):
-        is_variable = symbol.__class__ == "Variable"
-        return isinstance(symbol, Number) or is_variable or symbol.symbol() == ")"
+        from symbols.Variable import Variable
+        return isinstance(symbol, Number) or isinstance(symbol, Variable) or symbol.symbol() == ")"
 
     @staticmethod
     def forbidden_next_symbol(symbol):
-        is_variable = symbol.__class__ == "Variable"
-        return isinstance(symbol, Number) or is_variable or symbol.symbol() == "("
+        from symbols.Variable import Variable
+        return isinstance(symbol, Number) or isinstance(symbol, Variable) or symbol.symbol() == "("
