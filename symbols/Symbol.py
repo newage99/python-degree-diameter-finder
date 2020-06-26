@@ -33,12 +33,12 @@ class Symbol(ABC):
         return char == self.symbol()
 
     @staticmethod
-    def choice():
+    def random():
         new_c = random.choice(list(Symbol.symbols_dict().keys()))
         return new_c, new_c == '(', new_c == ')'
 
     @staticmethod
-    def parse_id(char: str, prev_number_or_symbol=None):
+    def parse(char: str, prev_number_or_symbol=None):
         symbols = Symbol.symbols_dict()
         if char in symbols:
             for symbol in symbols[char]:

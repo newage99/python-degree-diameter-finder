@@ -16,6 +16,11 @@ class Function(InterpretableSymbol):
     def compute(args):
         pass
 
+    @staticmethod
+    def forbidden_next_symbol(symbol):
+        from symbols.interpretable_symbol.functions.operators.Operator import Operator
+        return isinstance(symbol, Operator) or str(symbol) == ")"
+
     def interpret(self):
         globals.functions[-1].append(self)
 

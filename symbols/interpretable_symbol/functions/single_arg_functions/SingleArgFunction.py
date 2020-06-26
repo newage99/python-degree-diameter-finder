@@ -9,11 +9,10 @@ class SingleArgFunction(Function):
 
     @staticmethod
     def forbidden_prev_symbol(symbol):
-        raise NotImplementedError
+        return str(symbol) == ')'
 
-    @staticmethod
-    def forbidden_next_symbol(symbol):
-        raise NotImplementedError
+    def check_symbol(self, char, prev_num_or_symbol):
+        return char == self.symbol() and not SingleArgFunction.forbidden_prev_symbol(prev_num_or_symbol)
 
     @staticmethod
     def get_number_of_args():

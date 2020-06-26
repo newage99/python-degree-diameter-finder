@@ -9,8 +9,11 @@ def check_id(self, id, pos_to_mutate: int = -1, char_to_mutate: str = '', char_t
              suffix: str = '', check_parenthesis: bool = True):
     id_len = len(id)
     symbols = []
+    prev_char = None
     for char in id:
-        symbols.append(Symbol.symbols_dict()[char][0])
+        symbol = Symbol.parse(char, prev_number_or_symbol=prev_char)
+        symbols.append(symbol)
+        prev_char = symbol
     parenthesis_counter = 0
     for j in range(id_len):
         if id[j] == '(':

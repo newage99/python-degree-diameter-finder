@@ -1,12 +1,18 @@
-from symbols.Minus import Minus
 from symbols.interpretable_symbol.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
-from symbols.interpretable_symbol.functions.operators.Subtraction import Subtraction
 
 
-class Negation(Minus, SingleArgFunction):
+class Negation(SingleArgFunction):
 
-    def check_symbol(self, char, prev_number_or_symbol):
-        return char == self.symbol() and not Subtraction.has_valid_prev_char(prev_number_or_symbol)
+    @staticmethod
+    def forbidden_prev_symbol(symbol):
+        return str(symbol) == ')' or str(symbol) == '-'
+
+    def check_symbol(self, char, prev_num_or_symbol):
+        return char == self.symbol() and not Negation.forbidden_prev_symbol(prev_num_or_symbol)
+
+    @staticmethod
+    def symbol():
+        return "-"
 
     def compute(self, args):
         return -args[0]

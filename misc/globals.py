@@ -62,6 +62,10 @@ def __recursively_get_files(folder: str, exceptions: list):
     return files
 
 
+def get_class_name_that_implemented_function(func):
+    return func.__globals__['__name__'].split(".")[-1]
+
+
 def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_implement_name: str):
 
     folder = get_relative_path(dirname(abspath((inspect.stack()[1])[1])))
@@ -96,7 +100,13 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
                             pass
                     klass = getattr(foo, str(path.split("/")[-1]).replace(".py", ""))
                     obj = klass()
-                    if issubclass(klass, inherit_class) and callable(getattr(obj, function_they_implement_name, None)):
+                    they_implement_function = callable(getattr(obj, function_they_implement_name, None))
+                    # if they_implement_function and check_they_literally_implement_function:
+                    #     members = inspect.getmembers(klass, predicate=inspect.isfunction)
+                    #     func = [mem[1] for mem in members if mem[0] == function_they_implement_name][0]
+                    #     class_they_implemented_function = get_class_name_that_implemented_function(func)
+                    #     they_implement_function = path.endswith(class_they_implemented_function + ".py")
+                    if issubclass(klass, inherit_class) and they_implement_function:
                         class_str = str(obj)
                         if class_str in classes:
                             classes[class_str].append(obj)
