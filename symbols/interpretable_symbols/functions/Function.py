@@ -1,10 +1,12 @@
-from symbols.interpretable_symbol.InterpretableSymbol import InterpretableSymbol
+from symbols.interpretable_symbols.InterpretableSymbol import InterpretableSymbol
 import misc.globals as globals
 
 from abc import abstractmethod
 
 
 class Function(InterpretableSymbol):
+
+    ending_symbol = False
 
     @staticmethod
     @abstractmethod
@@ -18,7 +20,7 @@ class Function(InterpretableSymbol):
 
     @staticmethod
     def forbidden_next_symbol(symbol):
-        from symbols.interpretable_symbol.functions.operators.Operator import Operator
+        from symbols.interpretable_symbols.functions.operators.Operator import Operator
         return isinstance(symbol, Operator) or str(symbol) == ")"
 
     def interpret(self):

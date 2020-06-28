@@ -2,16 +2,15 @@ from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.config import wanted_length
 from misc.Random import *
 from symbols.numbers.Number import Number
-from symbols.interpretable_symbol.functions.operators.Operator import Operator
+from symbols.interpretable_symbols.functions.operators.Operator import Operator
 from symbols.Symbol import Symbol
-from symbols.variables.Variable import Variable
 
 
-variables_and_numbers = Number.numbers() + Variable.variables()
+numbers = Number.numbers()
 
 
-def random_var_or_number():
-    return random.choice(Number.numbers() + Variable.variables())
+def random_number():
+    return random.choice(numbers)
 
 
 class IdMutator:
@@ -32,7 +31,7 @@ class IdMutator:
     # Inserts a variable/number or an operator to the left or right of the value depending on the provided parameters
     @staticmethod
     def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
-        char_to_set = random_var_or_number() if var_or_operator else Operator.random()
+        char_to_set = random_number() if var_or_operator else Operator.random()
         return ('', char_to_set) if suffix_or_prefix else (char_to_set, '')
 
     # --------------------- #
@@ -74,7 +73,7 @@ class IdMutator:
             prev_char = id[pos - 1] if pos > 0 else ''
             if id[pos] == ')':
                 pos -= 3
-            elif (prev_char in (Operator.operators() + "(") or prev_char == '') and id[pos] in (variables_and_numbers + "("):
+            elif (prev_char in (Operator.operators() + "(") or prev_char == '') and id[pos] in (numbers + "("):
                 positions_to_insert_open_parenthesis.append(pos)
             pos -= 1
         there_are_positions_to_insert_open_parenthesis = len(positions_to_insert_open_parenthesis) > 0
@@ -91,7 +90,7 @@ class IdMutator:
             prev_char = id[pos - 1] if pos > 0 else ''
             if id[pos] == '(':
                 pos += 3
-            elif prev_char in (variables_and_numbers + ")") and id[pos] in (Operator.operators() + ")"):
+            elif prev_char in (numbers + ")") and id[pos] in (Operator.operators() + ")"):
                 positions_to_insert_close_parenthesis.append(pos)
             pos += 1
         positions_to_insert_close_parenthesis.append(len_id)
@@ -123,8 +122,10 @@ class IdMutator:
         return id
 
     def __mutate_id(self, get_additional_data: bool):
-        self.calculate_pos_to_mutate()
-        chars_available_to_mutate_to = self.get_chars_available_to_mutate_to()
+        chars_available_to_mutate_to = ""
+        while len(chars_available_to_mutate_to) == 0:
+            self.calculate_pos_to_mutate()
+            chars_available_to_mutate_to = self.get_chars_available_to_mutate_to()
         char_to_mutate_to = chars_available_to_mutate_to[random.randint(0, len(chars_available_to_mutate_to) - 1)]
         prefix, char_to_mutate_to, suffix = self.clean_char_to_mutate_to(char_to_mutate_to)
         new_id = self.id[:self.pos_to_mutate] + prefix + char_to_mutate_to + suffix + self.id[self.pos_to_mutate + 1:]
@@ -138,10 +139,14 @@ class IdMutator:
     # -------------------- #
 
     def get_chars_available_to_mutate_to(self):
-        chars_available_to_mutate_to = ''.join(list(Symbol.symbols_dict().keys()))
-        char_to_mutate = self.id[self.pos_to_mutate]
-        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(char_to_mutate, "")
+        symbols = []
+        prev = None
+        for char in self.id:
+            symbols.append(Symbol.parse(char, prev))
+            prev = symbols[-1]
         operators = Operator.operators()
+        char_to_mutate = self.id[self.pos_to_mutate]
+        chars_available_to_mutate_to = ''.join(list(Symbol.symbols_dict().keys())).replace(char_to_mutate, "")
 
         if char_to_mutate == '(' or self.__is_not_worth_mutate_to_close_parenthesis():
             # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
@@ -158,14 +163,16 @@ class IdMutator:
         # is not worth to mutate to char ')'.
         if char_to_mutate == ')' or self.__is_not_worth_mutate_to_open_parenthesis():
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
-        if char_to_mutate in variables_and_numbers:
+
+        if char_to_mutate in numbers:
             # In case we are going to mutate a variable or a number, we might mutate TO a variable, a number or
             # a parenthesis.
             for operator in operators:
                 chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operator, "")
+
         elif char_to_mutate in operators:
             # In case we are going to mutate an operator, we might mutate TO an operator or a parenthesis.
-            for var_or_number in variables_and_numbers:
+            for var_or_number in numbers:
                 chars_available_to_mutate_to = chars_available_to_mutate_to.replace(var_or_number, "")
 
         # If next char is '-', means that replacing to '+' or '-' would create a wrong expressions '+-' and '--'.
@@ -189,20 +196,20 @@ class IdMutator:
                 # In case the length of the actual id is lesser than the wanted length,
                 # we insert a variable prev to the negation to convert it to a subtraction.
                 if id_len < wanted_length:
-                    prefix = random_var_or_number()
+                    prefix = random_number()
                 # In case the length of the actual id is bigger than the wanted length, we remove the char to remove
                 # the negation. In negative case, we flip a coin to decide if we remove the negation or add a variable.
                 elif id_len > wanted_length or random_bool():
                     char_to_mutate_to = ''
                 else:
-                    prefix = random_var_or_number()
+                    prefix = random_number()
         # In case char to mutate is an open parenthesis...
         elif self.char_to_mutate == '(':
-            suffix_or_prefix = char_to_mutate_to in variables_and_numbers
+            suffix_or_prefix = char_to_mutate_to in numbers
             var_or_operator = char_to_mutate_to in Operator.operators()
             not_able_to_remove_char = next_char == '-' and self.pos_to_mutate > 0 and (
                         prev_char == '+' or prev_char == '-')
-            if (char_to_mutate_to in variables_and_numbers and next_char != '-') or (
+            if (char_to_mutate_to in numbers and next_char != '-') or (
                     char_to_mutate_to in Operator.operators() and (self.pos_to_mutate > 0 or next_char == '-')):
                 len_id = len(self.id)
                 # FIRST CONDITIONAL: This means id length will be 1 or more positions smaller than the wanted length
@@ -221,12 +228,12 @@ class IdMutator:
                 # of chars of the id) 'ppp+(-ppp' to this 'ppp+-ppp'. On that case, we would set the char to
                 # mutate to a number or a variable.
                 else:
-                    char_to_mutate_to = random_var_or_number() if not_able_to_remove_char else ''
+                    char_to_mutate_to = random_number() if not_able_to_remove_char else ''
         # In case char to mutate is an close parenthesis...
         elif self.char_to_mutate == ')':
             suffix_or_prefix = char_to_mutate_to in Operator.operators()
             var_or_operator = char_to_mutate_to in Operator.operators()
-            if char_to_mutate_to in variables_and_numbers or (char_to_mutate_to in Operator.operators() and next_char != '-'):
+            if char_to_mutate_to in numbers or (char_to_mutate_to in Operator.operators() and next_char != '-'):
                 len_id = len(self.id)
                 if len_id <= wanted_length or (len_id == wanted_length+1 and random_bool()):
                     prefix, suffix = IdMutator.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
@@ -234,16 +241,16 @@ class IdMutator:
                     char_to_mutate_to = ''
 
         if char_to_mutate_to == '(':
-            if self.char_to_mutate in variables_and_numbers and next_char in Operator.operators().replace("-", ""):
-                suffix = random_var_or_number()
-            elif self.char_to_mutate in Operator.operators() and (prev_char == ')' or prev_char in variables_and_numbers):
+            if self.char_to_mutate in numbers and next_char in Operator.operators().replace("-", ""):
+                suffix = random_number()
+            elif self.char_to_mutate in Operator.operators() and (prev_char == ')' or prev_char in numbers):
                 prefix = Operator.random()
         elif char_to_mutate_to == ')':
             if prev_char in Operator.operators():
-                prefix = random_var_or_number()
-                if next_char != '' and (next_char in variables_and_numbers or next_char == '('):
+                prefix = random_number()
+                if next_char != '' and (next_char in numbers or next_char == '('):
                     suffix = Operator.random()
-            elif next_char != '' and ((prev_char in variables_and_numbers and next_char != '-') or (
+            elif next_char != '' and ((prev_char in numbers and next_char != '-') or (
                     prev_char == ')' and next_char != '-')):
                 suffix = Operator.random()
 

@@ -7,7 +7,7 @@ from os.path import isfile, join, isdir, dirname, abspath
 
 expression = ''  # Expression to interpret
 pos = 0          # Actual position of the expression we are processing
-numbers = []     # List of tuples indicating the pairs of numbers pending to be merged
+numbers = []     # List of tuples indicating the pairs of constants pending to be merged
 """
 As the interpreter keeps reading the expression, this list gets added functions (single argument functions or
 operators) waiting to be computed. When a function computes his input/s, it gets removed from the list.
@@ -81,8 +81,8 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
                 location = possible_location
                 break
         if location:
-            exceptions = ["Symbol.py", "Function.py", "InterpretableSymbol.py", "Number.py", "Operator.py",
-                          "SingleArgFunction.py", "Variable.py"]
+            exceptions = ["Symbol.py", "Function.py", "InterpretableSymbol.py", "Operator.py",
+                          "SingleArgFunction.py", "Constant.py", "Number.py", "Variable.py"]
             paths = __recursively_get_files(location, exceptions)
             symbols_folder_locations = ["", "./../"]
             klass = None

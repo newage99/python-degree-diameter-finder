@@ -1,7 +1,7 @@
 import random
 
 from misc.globals import get_symbol_classes_that_inherit_from
-from symbols.interpretable_symbol.functions.Function import Function
+from symbols.interpretable_symbols.functions.Function import Function
 
 
 def get_operator_chars():
@@ -25,12 +25,9 @@ class Operator(Function):
     def symbol():
         raise NotImplementedError
 
-    def check_symbol(self, char, prev_num_or_symb):
-        return char == self.symbol() and prev_num_or_symb != "" and not Operator.forbidden_prev_symbol(prev_num_or_symb)
-
     @staticmethod
-    def forbidden_prev_symbol(symbol):
-        from symbols.interpretable_symbol.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
+    def forbidden_prev_symbol(symbol) -> bool:
+        from symbols.interpretable_symbols.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
         return isinstance(symbol, Operator) or isinstance(symbol, SingleArgFunction) or str(symbol) == "("
 
     @staticmethod

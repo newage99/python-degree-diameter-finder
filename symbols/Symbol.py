@@ -7,6 +7,7 @@ from misc.globals import get_symbol_classes_that_inherit_from
 class Symbol(ABC):
 
     starting_symbol = True
+    ending_symbol = True
 
     __symbols_dict = None
 
@@ -16,18 +17,28 @@ class Symbol(ABC):
             Symbol.__symbols_dict = get_symbol_classes_that_inherit_from("Symbol", "symbol")
         return Symbol.__symbols_dict
 
+    @staticmethod
+    def create_symbol_list(list_to_create, variable_name_that_must_be_true: str):
+        if not list_to_create:
+            list_to_create = []
+            symbols_dict = Symbol.symbols_dict()
+            for dict in symbols_dict:
+                for symbol in symbols_dict[dict]:
+                    if getattr(symbol, variable_name_that_must_be_true, False) and symbol.symbol() not in list_to_create:
+                        list_to_create.append(symbol.symbol())
+            return list_to_create
+
     __starting_symbols_list = None
 
     @staticmethod
     def starting_symbols() -> list:
-        if not Symbol.__starting_symbols_list:
-            Symbol.__starting_symbols_list = []
-            symbols_dict = Symbol.symbols_dict()
-            for dict in symbols_dict:
-                for symbol in symbols_dict[dict]:
-                    if symbol.starting_symbol and symbol.symbol() not in Symbol.__starting_symbols_list:
-                        Symbol.__starting_symbols_list.append(symbol.symbol())
-        return Symbol.__starting_symbols_list
+        return Symbol.create_symbol_list(Symbol.__starting_symbols_list, "starting_symbol")
+
+    __ending_symbols_list = None
+
+    @staticmethod
+    def ending_symbols() -> list:
+        return Symbol.create_symbol_list(Symbol.__ending_symbols_list, "ending_symbol")
 
     @staticmethod
     @abstractmethod
@@ -44,8 +55,9 @@ class Symbol(ABC):
     def forbidden_next_symbol(symbol) -> bool:
         pass
 
-    def check_symbol(self, char, prev_number_or_symbol):
-        return char == self.symbol()
+    def check_symbol(self, char, prev_num_or_symb):
+        return char == self.symbol() and (self.starting_symbol or prev_num_or_symb) and not self.forbidden_prev_symbol(
+            prev_num_or_symb)
 
     @staticmethod
     def random():

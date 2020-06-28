@@ -1,4 +1,4 @@
-from symbols.interpretable_symbol.functions.Function import Function
+from symbols.interpretable_symbols.functions.Function import Function
 
 
 class SingleArgFunction(Function):
@@ -8,11 +8,8 @@ class SingleArgFunction(Function):
         raise NotImplementedError
 
     @staticmethod
-    def forbidden_prev_symbol(symbol):
+    def forbidden_prev_symbol(symbol) -> bool:
         return str(symbol) == ')'
-
-    def check_symbol(self, char, prev_num_or_symbol):
-        return char == self.symbol() and not SingleArgFunction.forbidden_prev_symbol(prev_num_or_symbol)
 
     @staticmethod
     def get_number_of_args():

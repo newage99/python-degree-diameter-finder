@@ -22,11 +22,9 @@ class Number(Symbol):
         raise NotImplementedError
 
     @staticmethod
-    def forbidden_prev_symbol(symbol):
-        from symbols.variables.Variable import Variable
-        return isinstance(symbol, Number) or isinstance(symbol, Variable) or symbol.symbol() == ")"
+    def forbidden_prev_symbol(symbol) -> bool:
+        return isinstance(symbol, Number) or (symbol and str(symbol) == ")")
 
     @staticmethod
     def forbidden_next_symbol(symbol):
-        from symbols.variables.Variable import Variable
-        return isinstance(symbol, Number) or isinstance(symbol, Variable) or symbol.symbol() == "("
+        return isinstance(symbol, Number) or (symbol and str(symbol) == "(")

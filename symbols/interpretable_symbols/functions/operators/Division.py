@@ -1,4 +1,4 @@
-from symbols.interpretable_symbol.functions.operators.Operator import Operator
+from symbols.interpretable_symbols.functions.operators.Operator import Operator
 
 
 class Division(Operator):
