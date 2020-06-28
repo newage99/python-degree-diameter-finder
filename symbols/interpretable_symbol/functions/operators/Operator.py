@@ -11,6 +11,8 @@ def get_operator_chars():
 
 class Operator(Function):
 
+    starting_symbol = False
+
     __operators = None
 
     @staticmethod

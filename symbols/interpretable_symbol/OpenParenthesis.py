@@ -14,11 +14,11 @@ class OpenParenthesis(InterpretableSymbol):
 
     @staticmethod
     def forbidden_prev_symbol(symbol):
-        return isinstance(symbol, Number) or isinstance(symbol, Variable) or symbol.symbol() == ")"
+        return isinstance(symbol, Number) or isinstance(symbol, Variable) or (symbol and symbol.symbol() == ")")
 
     @staticmethod
     def forbidden_next_symbol(symbol):
-        return (isinstance(symbol, Operator) and symbol.symbol() != "-") or symbol.symbol() == ")"
+        return symbol is None or isinstance(symbol, Operator) or symbol.symbol() == ")"
 
     def interpret(self):
         globals.numbers.append([])

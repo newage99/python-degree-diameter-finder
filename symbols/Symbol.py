@@ -6,6 +6,8 @@ from misc.globals import get_symbol_classes_that_inherit_from
 
 class Symbol(ABC):
 
+    starting_symbol = True
+
     __symbols_dict = None
 
     @staticmethod
@@ -13,6 +15,19 @@ class Symbol(ABC):
         if not Symbol.__symbols_dict:
             Symbol.__symbols_dict = get_symbol_classes_that_inherit_from("Symbol", "symbol")
         return Symbol.__symbols_dict
+
+    __starting_symbols_list = None
+
+    @staticmethod
+    def starting_symbols() -> list:
+        if not Symbol.__starting_symbols_list:
+            Symbol.__starting_symbols_list = []
+            symbols_dict = Symbol.symbols_dict()
+            for dict in symbols_dict:
+                for symbol in symbols_dict[dict]:
+                    if symbol.starting_symbol and symbol.symbol() not in Symbol.__starting_symbols_list:
+                        Symbol.__starting_symbols_list.append(symbol.symbol())
+        return Symbol.__starting_symbols_list
 
     @staticmethod
     @abstractmethod
@@ -35,6 +50,11 @@ class Symbol(ABC):
     @staticmethod
     def random():
         new_c = random.choice(list(Symbol.symbols_dict().keys()))
+        return new_c, new_c == '(', new_c == ')'
+
+    @staticmethod
+    def random_starting_symbol():
+        new_c = random.choice(Symbol.starting_symbols())
         return new_c, new_c == '(', new_c == ')'
 
     @staticmethod

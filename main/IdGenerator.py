@@ -36,13 +36,9 @@ class IdGenerator:
     @staticmethod
     def generate_id(length=wanted_length):
         operators = Operator.operators()
-        new_id, is_open_parenthesis, is_close_parenthesis = Symbol.random()
+        new_id, is_open_parenthesis, is_close_parenthesis = Symbol.random_starting_symbol()
         new_id_symbols = [Symbol.parse(new_id)]
         parenthesis_counter = 1 if is_open_parenthesis else -1 if is_close_parenthesis else 0
-        while new_id in operators or new_id == ")":
-            new_id, is_open_parenthesis, is_close_parenthesis = Symbol.random()
-            new_id_symbols = [Symbol.parse(new_id)]
-            parenthesis_counter = 1 if is_open_parenthesis else 0
         while len(new_id) < length or new_id[-1] in operators or new_id[-1] == "(":
             new_c, is_open_parenthesis, is_close_parenthesis = Symbol.random()
             new_symbol = Symbol.parse(new_c, new_id_symbols[-1])
