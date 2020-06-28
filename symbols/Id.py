@@ -7,4 +7,3 @@ class Id:
         self.symbols = []
 
 
-

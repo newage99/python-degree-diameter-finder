@@ -35,8 +35,8 @@ class Symbol(ABC):
             symbols_dict = Symbol.symbols_dict()
             for dict in symbols_dict:
                 for symbol in symbols_dict[dict]:
-                    if getattr(symbol, variable_name_that_must_be_true, False) and symbol.symbol() not in list_to_create:
-                        list_to_create.append(symbol.symbol())
+                    if getattr(symbol, variable_name_that_must_be_true, False):
+                        list_to_create.append(symbol)
             return list_to_create
 
     __starting_symbols_list = None
@@ -77,7 +77,7 @@ class Symbol(ABC):
 
     @staticmethod
     def random_starting_symbol():
-        new_c = random.choice(Symbol.starting_symbols())
+        new_c = random.choice(Symbol.starting_symbols()).symbol()
         return new_c, new_c == '(', new_c == ')'
 
     @staticmethod
