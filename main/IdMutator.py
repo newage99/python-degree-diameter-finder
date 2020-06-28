@@ -144,41 +144,63 @@ class IdMutator:
         for char in self.id:
             symbols.append(Symbol.parse(char, prev))
             prev = symbols[-1]
-        operators = Operator.operators()
+        symbol_list = Symbol.symbols()
         char_to_mutate = self.id[self.pos_to_mutate]
         chars_available_to_mutate_to = ''.join(list(Symbol.symbols_dict().keys())).replace(char_to_mutate, "")
+
+        allowed_chars = []
+        forbidden_chars = []
+
+        if self.pos_to_mutate > 0:
+            prev_symbol = symbols[self.pos_to_mutate - 1]
+            for symbol in symbol_list:
+                if prev_symbol.forbidden_next_symbol(symbol):
+                    if symbol.symbol() not in forbidden_chars:
+                        forbidden_chars.append(symbol.symbol())
+                elif symbol.symbol() not in allowed_chars:
+                    allowed_chars.append(symbol.symbol())
+        else:
+            for symbol in symbol_list:
+                if symbol.starting_symbol:
+                    if symbol.symbol() not in forbidden_chars:
+                        allowed_chars.append(symbol.symbol())
+                elif symbol.symbol() not in allowed_chars:
+                    forbidden_chars.append(symbol.symbol())
+
+        for forbidden_char in forbidden_chars:
+            if forbidden_char not in allowed_chars:
+                chars_available_to_mutate_to = chars_available_to_mutate_to.replace(forbidden_char, "")
+        allowed_chars = []
+        forbidden_chars = []
+
+        if self.pos_to_mutate + 1 < len(self.id):
+            next_symbol = symbols[self.pos_to_mutate + 1]
+            for symbol in symbol_list:
+                if next_symbol.forbidden_prev_symbol(symbol):
+                    if symbol.symbol() not in forbidden_chars:
+                        forbidden_chars.append(symbol.symbol())
+                elif symbol.symbol() not in allowed_chars:
+                    allowed_chars.append(symbol.symbol())
+        else:
+            for symbol in symbol_list:
+                if symbol.ending_symbol:
+                    if symbol.symbol() not in forbidden_chars:
+                        allowed_chars.append(symbol.symbol())
+                elif symbol.symbol() not in allowed_chars:
+                    forbidden_chars.append(symbol.symbol())
+
+        for forbidden_char in forbidden_chars:
+            if forbidden_char not in allowed_chars:
+                chars_available_to_mutate_to = chars_available_to_mutate_to.replace(forbidden_char, "")
 
         if char_to_mutate == '(' or self.__is_not_worth_mutate_to_close_parenthesis():
             # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
             # is not worth to mutate to char ')'.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace(")", "")
-            # If char to mutate is '('...
-            if char_to_mutate == '(' and self.pos_to_mutate == 0:
-                # and it's located at the beginning of the id, placing an operator (except
-                # '-' one) there makes no sense. Examples: (n+1) -> /n+1), (n+1) -> *n+1)
-                for operator in operators:
-                    if operator != "-":
-                        chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operator, "")
-        # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
-        # is not worth to mutate to char ')'.
         if char_to_mutate == ')' or self.__is_not_worth_mutate_to_open_parenthesis():
+            # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
+            # is not worth to mutate to char ')'.
             chars_available_to_mutate_to = chars_available_to_mutate_to.replace("(", "")
-
-        if char_to_mutate in numbers:
-            # In case we are going to mutate a variable or a number, we might mutate TO a variable, a number or
-            # a parenthesis.
-            for operator in operators:
-                chars_available_to_mutate_to = chars_available_to_mutate_to.replace(operator, "")
-
-        elif char_to_mutate in operators:
-            # In case we are going to mutate an operator, we might mutate TO an operator or a parenthesis.
-            for var_or_number in numbers:
-                chars_available_to_mutate_to = chars_available_to_mutate_to.replace(var_or_number, "")
-
-        # If next char is '-', means that replacing to '+' or '-' would create a wrong expressions '+-' and '--'.
-        if self.pos_to_mutate + 1 < len(self.id) and self.id[self.pos_to_mutate + 1] == '-':
-            chars_available_to_mutate_to = chars_available_to_mutate_to.replace("+", "")
-            chars_available_to_mutate_to = chars_available_to_mutate_to.replace("-", "")
 
         return chars_available_to_mutate_to
 
@@ -243,7 +265,8 @@ class IdMutator:
         if char_to_mutate_to == '(':
             if self.char_to_mutate in numbers and next_char in Operator.operators().replace("-", ""):
                 suffix = random_number()
-            elif self.char_to_mutate in Operator.operators() and (prev_char == ')' or prev_char in numbers):
+            elif self.char_to_mutate in Operator.operators() and (
+                        prev_char == ')' or (prev_char != "" and prev_char in numbers)):
                 prefix = Operator.random()
         elif char_to_mutate_to == ')':
             if prev_char in Operator.operators():

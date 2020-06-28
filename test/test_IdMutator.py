@@ -9,7 +9,7 @@ class IdMutatorTest(unittest.TestCase):
 
     def perform_mutation_stress_test(self):
 
-        ids_lengths = [3, 5, 10, 25, 100]
+        ids_lengths = [5, 10, 25, 100]
         number_of_mutation_per_id = 50
         ids_per_length = 20
 

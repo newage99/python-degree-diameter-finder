@@ -17,6 +17,17 @@ class Symbol(ABC):
             Symbol.__symbols_dict = get_symbol_classes_that_inherit_from("Symbol", "symbol")
         return Symbol.__symbols_dict
 
+    __symbols_list = None
+
+    @staticmethod
+    def symbols():
+        if not Symbol.__symbols_list:
+            Symbol.__symbols_list = []
+            symbols_dict = Symbol.symbols_dict()
+            for value in symbols_dict.values():
+                Symbol.__symbols_list += value
+        return Symbol.__symbols_list
+
     @staticmethod
     def create_symbol_list(list_to_create, variable_name_that_must_be_true: str):
         if not list_to_create:
