@@ -1,6 +1,5 @@
 from main.ExpressionInterpreter import ExpressionInterpreter
 from misc.config import number_of_nodes
-from main.IdGenerator import IdGenerator
 import networkx
 
 
@@ -41,8 +40,3 @@ class AdjacencyMatrixGenerator:
                 if result > 0:
                     matrix[x][y] = matrix[y][x] = 1
         return matrix, AdjacencyMatrixGenerator.is_matrix_connected(matrix)
-
-
-if __name__ == '__main__':
-    # Way to easily debug function
-    AdjacencyMatrixGenerator.generate_and_get_if_its_connected(IdGenerator.generate_id(20), 5)

@@ -1,6 +1,7 @@
 from misc.config import wanted_length
 from symbols.interpretable_symbols.CloseParenthesis import CloseParenthesis
 from symbols.interpretable_symbols.functions.operators.Operator import Operator
+from symbols.Id import Id
 from symbols.Symbol import Symbol
 
 
@@ -72,7 +73,8 @@ class IdGenerator:
     def generate_connected_matrix_id():
         connected = False
         while not connected:
-            id = IdGenerator.generate_id()
+            # id = IdGenerator.generate_id()
+            id = str(Id.random())
             from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
         return id
