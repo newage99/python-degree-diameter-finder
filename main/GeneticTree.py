@@ -122,7 +122,7 @@ class GeneticTree:
 
     def to_json(self, indentation_exponent=1):
         indent = '\t' * indentation_exponent
-        ret = "{\n" + indent + '"id": "' + self.id + '",\n' + indent + '"iteration": ' + str(
+        ret = "{\n" + indent + '"id": "' + str(self.id) + '",\n' + indent + '"iteration": ' + str(
             self.iteration) + ",\n" + indent + '"degree": ' + str(self.degree) + ",\n" + indent + '"diameter": ' + str(
             self.diameter) + ",\n" + indent + '"score1": ' + str(self.score1) + ",\n" + indent + '"children": ['
         if len(self.children) > 0:

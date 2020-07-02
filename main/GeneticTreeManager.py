@@ -4,7 +4,7 @@ from misc.config import save_results_frequency
 from misc.config import max_number_of_children
 from main.ResultsManager import ResultsManager
 from main.GeneticTree import GeneticTree
-from main.IdGenerator import IdGenerator
+from symbols.Id import Id
 
 
 class GeneticTreeManager:
@@ -44,7 +44,7 @@ class GeneticTreeManager:
             if trees_list:
                 GeneticTreeManager.initial_trees = trees_list
             while len(GeneticTreeManager.initial_trees) < number_of_trees:
-                new_tree = GeneticTree(IdGenerator.generate_connected_matrix_id())
+                new_tree = GeneticTree(str(Id.random_connected_id()))
                 GeneticTreeManager.initial_trees.append(new_tree)
             GeneticTreeManager.trees = []
             for tree in GeneticTreeManager.initial_trees:
