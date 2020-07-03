@@ -1,12 +1,21 @@
-from symbols.interpretable_symbols.InterpretableSymbol import InterpretableSymbol
 import misc.globals as globals
 
 from abc import abstractmethod
+from symbols.interpretable_symbols.InterpretableSymbol import InterpretableSymbol
 
 
 class Function(InterpretableSymbol):
 
     ending_symbol = False
+    __symbols_list = None
+
+    @staticmethod
+    def symbols():
+        if not Function.__symbols_list:
+            symbols_dict = globals.get_symbol_classes_that_inherit_from("Function", "symbol")
+            for value in symbols_dict.values():
+                Function.__symbols_list += value
+        return Function.__symbols_list
 
     @staticmethod
     @abstractmethod
@@ -22,6 +31,11 @@ class Function(InterpretableSymbol):
     def forbidden_next_symbol(symbol):
         from symbols.interpretable_symbols.functions.operators.Operator import Operator
         return isinstance(symbol, Operator) or str(symbol) == ")"
+
+    @staticmethod
+    def random(prev_symbol=None, exceptions=None, symbols=None):
+        from symbols.Symbol import Symbol
+        return Symbol.random(prev_symbol, exceptions, Function.symbols())
 
     def interpret(self):
         globals.functions[-1].append(self)

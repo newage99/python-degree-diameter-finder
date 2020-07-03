@@ -1,9 +1,13 @@
 import random
 
+from misc.Random import random_bool
 from misc.config import wanted_length
 from symbols.Symbol import Symbol
 from symbols.interpretable_symbols.CloseParenthesis import CloseParenthesis
 from symbols.interpretable_symbols.OpenParenthesis import OpenParenthesis
+from symbols.interpretable_symbols.functions.operators.Operator import Operator
+from symbols.interpretable_symbols.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
+from symbols.numbers.Number import Number
 
 
 class Id:
@@ -27,6 +31,11 @@ class Id:
             if len(valid_symbols_to_append) > 0:
                 return random.choice(valid_symbols_to_append)
         raise Exception
+
+    @staticmethod
+    def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
+        symbol_to_set = Number.random() if var_or_operator else Operator.random()
+        return (None, symbol_to_set) if suffix_or_prefix else (symbol_to_set, None)
 
     def __is_not_worth_mutate_to_open_parenthesis(self, pos_to_mutate):
         len_id = len(self.__symbols)
@@ -83,8 +92,95 @@ class Id:
             symbols_available_to_mutate_to.remove(OpenParenthesis())
         return symbols_available_to_mutate_to
 
-    def __clean_symbol_to_mutate_to(self, symbol_to_mutate_to):
-        pass
+    def __clean_symbol_to_mutate_to(self, pos_to_mutate: int, symbol_to_mutate_to: Symbol):
+        prefix = None
+        suffix = None
+        symbol_to_mutate = self.__symbols[pos_to_mutate]
+        prev_symbol = self.__symbols[pos_to_mutate - 1] if pos_to_mutate > 0 else None
+        next_symbol = self.__symbols[pos_to_mutate + 1] if pos_to_mutate + 1 < len(self.__symbols) else None
+
+        if isinstance(symbol_to_mutate, SingleArgFunction):
+            if isinstance(symbol_to_mutate_to, Operator):
+                id_len = len(self.__symbols)
+                # In case the length of the actual id is lesser than the wanted length,
+                # we insert a variable prev to the negation to convert it to a subtraction.
+                if id_len < wanted_length:
+                    prefix = Number.random()
+                # In case the length of the actual id is bigger than the wanted length, we remove the char to remove
+                # the negation. In negative case, we flip a coin to decide if we remove the negation or add a variable.
+                elif id_len > wanted_length or random_bool():
+                    symbol_to_mutate_to = None
+                else:
+                    prefix = Number.random()
+        elif str(symbol_to_mutate) == "(":
+            suffix_or_prefix = isinstance(symbol_to_mutate_to, Number)
+            var_or_operator = isinstance(symbol_to_mutate_to, Operator)
+            not_able_to_remove_char = str(next_symbol) == "-" and pos_to_mutate > 0 and (
+                        str(prev_symbol) == "-" or str(prev_symbol) == "+")
+            # not_able_to_remove_char = next_char == '-' and self.pos_to_mutate > 0 and (prev_char == '+' or prev_char == '-')
+            if (isinstance(symbol_to_mutate_to, Number) and str(next_symbol) != "-") or (
+                    isinstance(symbol_to_mutate_to, Operator) and (pos_to_mutate > 0 or str(next_symbol) == "-")):
+            # if (char_to_mutate_to in numbers and next_char != '-') or (
+            #         char_to_mutate_to in Operator.operators() and (self.pos_to_mutate > 0 or next_char == '-')):
+                len_id = len(self.__symbols)
+                # FIRST CONDITIONAL: This means id length will be 1 or more positions smaller than the wanted length
+                # (because an ')' char will be later removed from the id).
+                # SECOND CONDITIONAL: This means the id length will be equal to the wanted length after we remove an
+                # ')' char. In negative case, we flip a coin to decide if we add a char to the chars_to_mutate_to
+                # string or we don't insert any char at all.
+                if len_id <= wanted_length or (len_id == wanted_length + 1 and random_bool()):
+                    # Given we want the id length to be equal to the wanted length,
+                    # we add a char either to the prefix or suffix
+                    prefix, suffix = Id.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
+                # The only cases left to consider are the ones where the id length is 2 or more chars bigger than
+                # the wanted length. In that case, for sure we don't insert any char at all.
+                # If we don't insert any char at all, on ids where the char to mutate is surrounded by an '+'
+                # and an '-' char, not inserting any char would transform the id from this: (let p be the rest
+                # of chars of the id) 'ppp+(-ppp' to this 'ppp+-ppp'. On that case, we would set the char to
+                # mutate to a number or a variable.
+                else:
+                    symbol_to_mutate_to = Number.random() if not_able_to_remove_char else None
+            # In case char to mutate is an close parenthesis...
+        elif str(symbol_to_mutate) == ')':
+            suffix_or_prefix = isinstance(symbol_to_mutate_to, Operator)
+            var_or_operator = isinstance(symbol_to_mutate_to, Operator)
+            if isinstance(symbol_to_mutate_to, Number) or (
+                    isinstance(symbol_to_mutate_to, Operator) and str(next_symbol) != "-"):
+            # if char_to_mutate_to in numbers or (char_to_mutate_to in Operator.operators() and next_char != '-'):
+                len_id = len(self.__symbols)
+                if len_id <= wanted_length or (len_id == wanted_length + 1 and random_bool()):
+                    prefix, suffix = Id.__set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix)
+                else:
+                    symbol_to_mutate_to = None
+
+        if str(symbol_to_mutate_to) == '(':
+            if isinstance(symbol_to_mutate, Number) and isinstance(next_symbol, Operator):
+                suffix = Number.random()
+            elif isinstance(symbol_to_mutate, Operator) and (
+                    str(prev_symbol) == ")" or (prev_symbol and isinstance(prev_symbol, Number))):
+                prefix = Operator.random()
+            # if self.char_to_mutate in numbers and next_char in Operator.operators().replace("-", ""):
+            #     suffix = random_number()
+            # elif self.char_to_mutate in Operator.operators() and (
+            #             prev_char == ')' or (prev_char != "" and prev_char in numbers)):
+            #     prefix = Operator.random_operator()
+        elif str(symbol_to_mutate_to) == ')':
+            if isinstance(prev_symbol, Operator):
+                prefix = Number.random()
+                if next_symbol and (isinstance(next_symbol, Number) or str(next_symbol) == "("):
+                    suffix = Operator.random()
+            elif next_symbol and ((isinstance(prev_symbol, Number) and str(next_symbol) != "-") or (
+                    str(prev_symbol) == ")" and str(next_symbol) != "-")):
+                suffix = Operator.random()
+            # if prev_char in Operator.operators():
+            #     prefix = random_number()
+            #     if next_char != '' and (next_char in numbers or next_char == '('):
+            #         suffix = Operator.random_operator()
+            # elif next_char != '' and ((prev_char in numbers and next_char != '-') or (
+            #         prev_char == ')' and next_char != '-')):
+            #     suffix = Operator.random_operator()
+
+        return prefix, symbol_to_mutate_to, suffix
 
     # -- PUBLIC METHODS -- #
 
@@ -131,7 +227,7 @@ class Id:
             pos_to_mutate = random.randint(0, len(self.__symbols) - 1)
             symbols_available_to_mutate_to = self.__get_symbols_available_to_mutate_to(pos_to_mutate)
         symbol_to_mutate_to = random.choice(symbols_available_to_mutate_to)
-        prefix, symbol_to_mutate_to, suffix = self.__clean_symbol_to_mutate_to(symbol_to_mutate_to)
+        prefix, symbol_to_mutate_to, suffix = self.__clean_symbol_to_mutate_to(pos_to_mutate, symbol_to_mutate_to)
         new_id = self.__symbols[:pos_to_mutate] + prefix + symbol_to_mutate_to + suffix + self.__symbols[pos_to_mutate + 1:]
         return new_id
 
@@ -147,7 +243,15 @@ class Id:
         return self.__symbols[item]
 
     def __add__(self, other):
-        return Id(self.__symbols + other.__symbols)
+        if other is None:
+            return Id(self.__symbols)
+        else:
+            class_name = other.__class__.__name__
+            if class_name == "Id":
+                return Id(self.__symbols + other.__symbols)
+            elif isinstance(other, Symbol):
+                return Id(self.__symbols + [other])
+        return None
 
 
 if __name__ == "__main__":

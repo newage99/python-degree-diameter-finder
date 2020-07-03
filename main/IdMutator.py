@@ -31,7 +31,7 @@ class IdMutator:
     # Inserts a variable/number or an operator to the left or right of the value depending on the provided parameters
     @staticmethod
     def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
-        char_to_set = random_number() if var_or_operator else Operator.random()
+        char_to_set = random_number() if var_or_operator else Operator.random_operator()
         return ('', char_to_set) if suffix_or_prefix else (char_to_set, '')
 
     # --------------------- #
@@ -267,15 +267,15 @@ class IdMutator:
                 suffix = random_number()
             elif self.char_to_mutate in Operator.operators() and (
                         prev_char == ')' or (prev_char != "" and prev_char in numbers)):
-                prefix = Operator.random()
+                prefix = Operator.random_operator()
         elif char_to_mutate_to == ')':
             if prev_char in Operator.operators():
                 prefix = random_number()
                 if next_char != '' and (next_char in numbers or next_char == '('):
-                    suffix = Operator.random()
+                    suffix = Operator.random_operator()
             elif next_char != '' and ((prev_char in numbers and next_char != '-') or (
                     prev_char == ')' and next_char != '-')):
-                suffix = Operator.random()
+                suffix = Operator.random_operator()
 
         return prefix, char_to_mutate_to, suffix
 

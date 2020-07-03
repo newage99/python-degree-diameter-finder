@@ -103,11 +103,13 @@ class Symbol(ABC):
         return None
 
     @staticmethod
-    def random(prev_symbol=None, exceptions=None):
+    def random(prev_symbol=None, exceptions=None, symbols=None):
+        if symbols is None:
+            symbols = Symbol.symbols()
         if exceptions is None:
             exceptions = []
         symbols_to_choose_from = []
-        for symbol in Symbol.symbols():
+        for symbol in symbols:
             if symbol not in exceptions and (not prev_symbol or symbol.check_prev_symbol(prev_symbol)):
                 symbols_to_choose_from.append(symbol)
         return random.choice(symbols_to_choose_from)

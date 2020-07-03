@@ -14,6 +14,15 @@ class Operator(Function):
     starting_symbol = False
 
     __operators = None
+    __symbols_list = None
+
+    @staticmethod
+    def symbols():
+        if not Operator.__symbols_list:
+            symbols_dict = get_symbol_classes_that_inherit_from("Operator", "symbol")
+            for value in symbols_dict.values():
+                Operator.__symbols_list += value
+        return Operator.__symbols_list
 
     @staticmethod
     def operators():
@@ -39,5 +48,10 @@ class Operator(Function):
         raise NotImplementedError
 
     @staticmethod
-    def random():
+    def random(prev_symbol=None, exceptions=None, symbols=None):
+        from symbols.Symbol import Symbol
+        return Symbol.random(prev_symbol, exceptions, Operator.symbols())
+
+    @staticmethod
+    def random_operator():
         return random.choice(Operator.operators())

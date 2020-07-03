@@ -1,7 +1,18 @@
+from misc.globals import get_symbol_classes_that_inherit_from
 from symbols.interpretable_symbols.functions.Function import Function
 
 
 class SingleArgFunction(Function):
+
+    __symbols_list = None
+
+    @staticmethod
+    def symbols():
+        if not SingleArgFunction.__symbols_list:
+            symbols_dict = get_symbol_classes_that_inherit_from("SingleArgFunction", "symbol")
+            for value in symbols_dict.values():
+                SingleArgFunction.__symbols_list += value
+        return SingleArgFunction.__symbols_list
 
     @staticmethod
     def symbol():
@@ -10,6 +21,11 @@ class SingleArgFunction(Function):
     @staticmethod
     def forbidden_prev_symbol(symbol) -> bool:
         return str(symbol) == ')'
+
+    @staticmethod
+    def random(prev_symbol=None, exceptions=None, symbols=None):
+        from symbols.Symbol import Symbol
+        return Symbol.random(prev_symbol, exceptions, SingleArgFunction.symbols())
 
     @staticmethod
     def get_number_of_args():
