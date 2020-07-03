@@ -1,4 +1,5 @@
 from misc.globals import get_symbol_classes_that_inherit_from
+from symbols.interpretable_symbols.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
 from symbols.Symbol import Symbol
 
 
@@ -27,4 +28,4 @@ class Number(Symbol):
 
     @staticmethod
     def forbidden_next_symbol(symbol):
-        return isinstance(symbol, Number) or (symbol and str(symbol) == "(")
+        return isinstance(symbol, Number) or (symbol and str(symbol) == "(") or isinstance(symbol, SingleArgFunction)

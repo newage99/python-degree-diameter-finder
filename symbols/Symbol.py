@@ -121,7 +121,7 @@ class Symbol(ABC):
     def check_prev_symbol(self, prev):
         return prev and not self.forbidden_prev_symbol(prev) and not prev.forbidden_next_symbol(self)
 
-    # -- MAGIC METHODS OVERRIDE -- #
+    # -- MAGIC METHODS OVERRIDES -- #
 
     def __str__(self):
         return self.symbol()
