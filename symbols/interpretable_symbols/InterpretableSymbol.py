@@ -11,6 +11,7 @@ class InterpretableSymbol(Symbol):
     @staticmethod
     def symbols():
         if not InterpretableSymbol.__symbols_list:
+            InterpretableSymbol.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("InterpretableSymbol", "symbol")
             for value in symbols_dict.values():
                 InterpretableSymbol.__symbols_list += value

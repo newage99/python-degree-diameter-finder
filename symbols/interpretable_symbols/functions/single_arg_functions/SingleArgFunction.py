@@ -9,6 +9,7 @@ class SingleArgFunction(Function):
     @staticmethod
     def symbols():
         if not SingleArgFunction.__symbols_list:
+            SingleArgFunction.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("SingleArgFunction", "symbol")
             for value in symbols_dict.values():
                 SingleArgFunction.__symbols_list += value

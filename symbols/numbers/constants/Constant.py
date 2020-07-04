@@ -15,6 +15,7 @@ class Constant(Number):
     @staticmethod
     def symbols():
         if not Constant.__symbols_list:
+            Constant.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("Constant", "symbol")
             for value in symbols_dict.values():
                 Constant.__symbols_list += value

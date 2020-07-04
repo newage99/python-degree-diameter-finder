@@ -16,6 +16,7 @@ class Number(Symbol):
     @staticmethod
     def symbols():
         if not Number.__symbols_list:
+            Number.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("Number", "symbol")
             for value in symbols_dict.values():
                 Number.__symbols_list += value

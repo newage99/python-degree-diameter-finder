@@ -15,6 +15,7 @@ class Variable(Number):
     @staticmethod
     def symbols():
         if not Variable.__symbols_list:
+            Variable.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("Variable", "symbol")
             for value in symbols_dict.values():
                 Variable.__symbols_list += value

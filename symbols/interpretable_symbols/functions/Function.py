@@ -12,6 +12,7 @@ class Function(InterpretableSymbol):
     @staticmethod
     def symbols():
         if not Function.__symbols_list:
+            Function.__symbols_list = []
             symbols_dict = globals.get_symbol_classes_that_inherit_from("Function", "symbol")
             for value in symbols_dict.values():
                 Function.__symbols_list += value

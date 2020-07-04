@@ -19,6 +19,7 @@ class Operator(Function):
     @staticmethod
     def symbols():
         if not Operator.__symbols_list:
+            Operator.__symbols_list = []
             symbols_dict = get_symbol_classes_that_inherit_from("Operator", "symbol")
             for value in symbols_dict.values():
                 Operator.__symbols_list += value
