@@ -123,6 +123,10 @@ class Symbol(ABC):
     def check_prev_symbol(self, prev):
         return prev and not self.forbidden_prev_symbol(prev) and not prev.forbidden_next_symbol(self)
 
+    @staticmethod
+    def check(first, second):
+        return not first.forbidden_next_symbol(second) and not second.forbidden_prev_symbol(first)
+
     # -- MAGIC METHODS OVERRIDES -- #
 
     def __str__(self):
