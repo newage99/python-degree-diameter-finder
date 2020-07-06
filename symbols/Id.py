@@ -6,7 +6,6 @@ from symbols.Symbol import Symbol
 from symbols.interpretable_symbols.CloseParenthesis import CloseParenthesis
 from symbols.interpretable_symbols.OpenParenthesis import OpenParenthesis
 from symbols.interpretable_symbols.functions.Function import Function
-from symbols.interpretable_symbols.functions.operators.Operator import Operator
 from symbols.numbers.Number import Number
 
 
@@ -18,25 +17,73 @@ class Id:
 
     # -- PRIVATE METHODS -- #
 
-    @staticmethod
-    def __random_symbol_to_append_in_list_if_not_return_random(symbols: list, prev_symbol: Symbol,
-                                                               exceptions: list = None):
-        if not exceptions:
-            exceptions = []
-        symbol_lists = [symbols, Symbol.symbols()]
-        valid_symbols_to_append = []
-        for symbol_list in symbol_lists:
-            for symbol in symbol_list:
-                if symbol not in exceptions and symbol.check_prev_symbol(prev_symbol):
-                    valid_symbols_to_append.append(symbol)
-            if len(valid_symbols_to_append) > 0:
-                return random.choice(valid_symbols_to_append)
-        raise Exception
-
-    @staticmethod
-    def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
-        symbol_to_set = Number.random() if var_or_operator else Operator.random()
-        return (None, symbol_to_set) if suffix_or_prefix else (symbol_to_set, None)
+    # @staticmethod
+    # def __set_var_or_operator_to_suff_or_pref(var_or_operator, suffix_or_prefix):
+    #     symbol_to_set = Number.random() if var_or_operator else Operator.random()
+    #     return (None, symbol_to_set) if suffix_or_prefix else (symbol_to_set, None)
+    #
+    # def __get_symbols_available_to_mutate_to(self, pos_to_mutate):
+    #     prev_symbol = self[pos_to_mutate - 1] if pos_to_mutate > 0 else None
+    #     next_symbol = self[pos_to_mutate + 1] if pos_to_mutate + 1 < len(self) else None
+    #     symbols_available_to_mutate_to = Symbol.symbols().copy()
+    #     char_to_mutate = str(self[pos_to_mutate])
+    #
+    #     # if char_to_mutate != "(" and char_to_mutate != ")":
+    #     for symbol in Symbol.symbols():
+    #         if (prev_symbol and not Symbol.check(prev_symbol, symbol)) or (
+    #                 not prev_symbol and not symbol.starting_symbol) or (
+    #                 next_symbol and not Symbol.check(symbol, next_symbol)) or (
+    #                 not next_symbol and not symbol.ending_symbol):
+    #             symbols_available_to_mutate_to.remove(symbol)
+    #     if len(symbols_available_to_mutate_to) == 0:
+    #         raise Exception
+    #
+    #     if self[pos_to_mutate] in symbols_available_to_mutate_to:
+    #         symbols_available_to_mutate_to.remove(self[pos_to_mutate])
+    #
+    #     if (char_to_mutate == '(' or self.__is_not_worth_mutate_to_close_parenthesis(
+    #             pos_to_mutate)) and CloseParenthesis() in symbols_available_to_mutate_to:
+    #         # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
+    #         # is not worth to mutate to char ')'.
+    #         symbols_available_to_mutate_to.remove(CloseParenthesis())
+    #     if (char_to_mutate == ')' or self.__is_not_worth_mutate_to_open_parenthesis(
+    #             pos_to_mutate)) and OpenParenthesis() in symbols_available_to_mutate_to:
+    #         # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
+    #         # is not worth to mutate to char ')'.
+    #         symbols_available_to_mutate_to.remove(OpenParenthesis())
+    #
+    #     return symbols_available_to_mutate_to
+    #
+    # def __clean_symbol_to_mutate_to(self, pos_to_mutate: int, symbol_to_mutate_to: Symbol):
+    #     prefix = None
+    #     suffix = None
+    #     symbol_to_mutate = self[pos_to_mutate]
+    #     prev_symbol = self[pos_to_mutate - 1] if pos_to_mutate > 0 else None
+    #     next_symbol = self[pos_to_mutate + 1] if pos_to_mutate + 1 < len(self) else None
+    #
+    #     if (str(symbol_to_mutate) == "(" or str(symbol_to_mutate) == ")") and len(self) > self.__initial_length:
+    #         if Symbol.check(prev_symbol, next_symbol):
+    #             symbol_to_mutate_to = None
+    #         else:
+    #             symbols_to_replace_symbol_to_mutate_to = []
+    #             for symbol in Symbol.symbols():
+    #                 if Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol) and str(
+    #                         symbol) != "(" and str(symbol) != ")":
+    #                     symbols_to_replace_symbol_to_mutate_to.append(symbol)
+    #             if len(symbols_to_replace_symbol_to_mutate_to) > 0:
+    #                 symbol_to_mutate_to = random.choice(symbols_to_replace_symbol_to_mutate_to)
+    #             else:
+    #                 raise Exception
+    #
+    #     final_symbols = []
+    #     if prefix:
+    #         final_symbols.append(prefix)
+    #     if symbol_to_mutate_to:
+    #         final_symbols.append(symbol_to_mutate_to)
+    #     if suffix:
+    #         final_symbols.append(suffix)
+    #
+    #     return final_symbols
 
     @staticmethod
     def __insert_open_parenthesis_until_pos(id, pos):
@@ -52,7 +99,7 @@ class Id:
             pos -= 1
         there_are_positions_to_insert_open_parenthesis = len(positions_to_insert_open_parenthesis) > 0
         if there_are_positions_to_insert_open_parenthesis:
-            pos = positions_to_insert_open_parenthesis[random.randint(0, len(positions_to_insert_open_parenthesis) - 1)]
+            pos = random.choice(positions_to_insert_open_parenthesis)
             return Id(id[:pos] + [OpenParenthesis()] + id[pos:])
         raise Exception
 
@@ -71,7 +118,7 @@ class Id:
                 positions_to_insert_close_parenthesis.append(pos)
             pos += 1
         positions_to_insert_close_parenthesis.append(len_id)
-        pos = positions_to_insert_close_parenthesis[random.randint(0, len(positions_to_insert_close_parenthesis) - 1)]
+        pos = random.choice(positions_to_insert_close_parenthesis)
         if pos == len_id:
             return Id(id + CloseParenthesis())
         return Id(id[:pos] + [CloseParenthesis()] + id[pos:])
@@ -198,92 +245,6 @@ class Id:
                 pos -= 1
         return False
 
-    def __get_symbols_available_to_mutate_to(self, pos_to_mutate):
-        prev_symbol = self[pos_to_mutate - 1] if pos_to_mutate > 0 else None
-        next_symbol = self[pos_to_mutate + 1] if pos_to_mutate + 1 < len(self) else None
-        symbols_available_to_mutate_to = Symbol.symbols().copy()
-        char_to_mutate = str(self[pos_to_mutate])
-
-        # if char_to_mutate != "(" and char_to_mutate != ")":
-        for symbol in Symbol.symbols():
-            if (prev_symbol and not Symbol.check(prev_symbol, symbol)) or (
-                    not prev_symbol and not symbol.starting_symbol) or (
-                    next_symbol and not Symbol.check(symbol, next_symbol)) or (
-                    not next_symbol and not symbol.ending_symbol):
-                symbols_available_to_mutate_to.remove(symbol)
-        if len(symbols_available_to_mutate_to) == 0:
-            raise Exception
-
-        if self[pos_to_mutate] in symbols_available_to_mutate_to:
-            symbols_available_to_mutate_to.remove(self[pos_to_mutate])
-
-        if (char_to_mutate == '(' or self.__is_not_worth_mutate_to_close_parenthesis(
-                pos_to_mutate)) and CloseParenthesis() in symbols_available_to_mutate_to:
-            # If char to mutate is '(' or if we are to close to the beginning of the id or to a '(' char,
-            # is not worth to mutate to char ')'.
-            symbols_available_to_mutate_to.remove(CloseParenthesis())
-        if (char_to_mutate == ')' or self.__is_not_worth_mutate_to_open_parenthesis(
-                pos_to_mutate)) and OpenParenthesis() in symbols_available_to_mutate_to:
-            # If char to mutate is ')' or if we are to close to the end of the id or to a ')' char,
-            # is not worth to mutate to char ')'.
-            symbols_available_to_mutate_to.remove(OpenParenthesis())
-
-        return symbols_available_to_mutate_to
-
-    def __clean_symbol_to_mutate_to(self, pos_to_mutate: int, symbol_to_mutate_to: Symbol):
-        prefix = None
-        suffix = None
-        symbol_to_mutate = self[pos_to_mutate]
-        prev_symbol = self[pos_to_mutate - 1] if pos_to_mutate > 0 else None
-        next_symbol = self[pos_to_mutate + 1] if pos_to_mutate + 1 < len(self) else None
-
-        if (str(symbol_to_mutate) == "(" or str(symbol_to_mutate) == ")") and len(self) > self.__initial_length:
-            if Symbol.check(prev_symbol, next_symbol):
-                symbol_to_mutate_to = None
-            else:
-                symbols_to_replace_symbol_to_mutate_to = []
-                for symbol in Symbol.symbols():
-                    if Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol) and str(
-                            symbol) != "(" and str(symbol) != ")":
-                        symbols_to_replace_symbol_to_mutate_to.append(symbol)
-                if len(symbols_to_replace_symbol_to_mutate_to) > 0:
-                    symbol_to_mutate_to = random.choice(symbols_to_replace_symbol_to_mutate_to)
-                else:
-                    raise Exception
-            # else:
-            #     valid_prefix_symbols = []
-            #     valid_suffix_symbols = []
-            #     for symbol in Symbol.symbols():
-            #         if str(symbol) != "(" and str(symbol) != ")":
-            #             if (not prev_symbol or Symbol.check(prev_symbol, symbol)) and Symbol.check(symbol,
-            #                                                                                        symbol_to_mutate_to):
-            #                 valid_prefix_symbols.append(symbol)
-            #             if (not next_symbol or Symbol.check(symbol, next_symbol)) and Symbol.check(symbol_to_mutate_to,
-            #                                                                                        symbol):
-            #                 valid_suffix_symbols.append(symbol)
-            #     valid_prefixes = len(valid_prefix_symbols) > 0
-            #     valid_suffixes = len(valid_suffix_symbols) > 0
-            #     if valid_prefixes or valid_suffixes:
-            #         if valid_prefixes and valid_suffixes:
-            #             if random_bool():
-            #                 prefix = random.choice(valid_prefix_symbols)
-            #             else:
-            #                 suffix = random.choice(valid_suffix_symbols)
-            #         elif valid_prefixes:
-            #             prefix = random.choice(valid_prefix_symbols)
-            #         else:
-            #             suffix = random.choice(valid_suffix_symbols)
-
-        final_symbols = []
-        if prefix:
-            final_symbols.append(prefix)
-        if symbol_to_mutate_to:
-            final_symbols.append(symbol_to_mutate_to)
-        if suffix:
-            final_symbols.append(suffix)
-
-        return final_symbols
-
     # -- PUBLIC METHODS -- #
 
     @staticmethod
@@ -293,20 +254,19 @@ class Id:
         parenthesis_counter = 1 if str(new_id[-1]) == "(" else 0
         while len(new_id) < length or new_id[-1] not in Symbol.ending_symbols() or parenthesis_counter > 0:
             num_of_symbols_left_to_add = length - len(new_id)
+            symbols = []
+            exceptions = []
             if parenthesis_counter > 0 and parenthesis_counter >= num_of_symbols_left_to_add:
-                new_symbol = Id.__random_symbol_to_append_in_list_if_not_return_random([CloseParenthesis()], new_id[-1],
-                                                                                       [OpenParenthesis()])
+                symbols = [CloseParenthesis()]
+                exceptions = [OpenParenthesis()]
             else:
-                exceptions = []
                 if parenthesis_counter == 0 or len(new_id) - last_close_parenthesis_pos < 3:
                     exceptions.append(CloseParenthesis())
                 if num_of_symbols_left_to_add <= 4 + parenthesis_counter:
                     exceptions.append(OpenParenthesis())
                 if len(new_id) + 1 >= length:
-                    new_symbol = Id.__random_symbol_to_append_in_list_if_not_return_random(Symbol.ending_symbols(),
-                                                                                           new_id[-1], exceptions)
-                else:
-                    new_symbol = Symbol.random(new_id[-1], exceptions)
+                    symbols = Symbol.ending_symbols()
+            new_symbol = Symbol.random(new_id[-1], exceptions, symbols, True)
             if str(new_symbol) == "(":
                 parenthesis_counter += 1
                 last_close_parenthesis_pos = len(new_id)
@@ -328,7 +288,7 @@ class Id:
         symbols_available_to_mutate_to = []
         pos_to_mutate = -1
         while len(symbols_available_to_mutate_to) == 0:
-            pos_to_mutate = random.randint(0, len(self) - 1)
+            pos_to_mutate = random.choice(range(len(self)))
             char_to_mutate = str(self[pos_to_mutate])
             symbols_available_to_mutate_to = self.__get_symbols_available_to_mutate_to(pos_to_mutate)
         symbol_to_mutate_to = random.choice(symbols_available_to_mutate_to)

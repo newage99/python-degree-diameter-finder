@@ -103,16 +103,23 @@ class Symbol(ABC):
         return None
 
     @staticmethod
-    def random(prev_symbol=None, exceptions=None, symbols=None):
-        if symbols is None:
-            symbols = Symbol.symbols()
+    def random(prev_symbol=None, exceptions=None, symbols=None, if_not_symbols_return_random: bool = False):
+        symbol_lists = [Symbol.symbols()]
+        if symbols:
+            if if_not_symbols_return_random:
+                symbol_lists.insert(0, symbols)
+            else:
+                symbol_lists = [symbols]
         if exceptions is None:
             exceptions = []
         symbols_to_choose_from = []
-        for symbol in symbols:
-            if symbol not in exceptions and (not prev_symbol or symbol.check_prev_symbol(prev_symbol)):
-                symbols_to_choose_from.append(symbol)
-        return random.choice(symbols_to_choose_from)
+        for symbol_list in symbol_lists:
+            for symbol in symbol_list:
+                if symbol not in exceptions and (not prev_symbol or symbol.check_prev_symbol(prev_symbol)):
+                    symbols_to_choose_from.append(symbol)
+            if len(symbols_to_choose_from) > 0:
+                return random.choice(symbols_to_choose_from)
+        raise Exception
 
     # -- INSTANCE METHODS -- #
 
