@@ -6,7 +6,7 @@ class Negation(SingleArgFunction):
     @staticmethod
     def forbidden_prev_symbol(symbol) -> bool:
         from symbols.interpretable_symbols.functions.operators.Operator import Operator
-        return str(symbol) == ')' or (isinstance(symbol, Operator) and str(symbol) == '+') or str(symbol) == '-'
+        return str(symbol) == ")" or (isinstance(symbol, Operator) and str(symbol) == "+") or str(symbol) == "-"
 
     @staticmethod
     def forbidden_next_symbol(symbol):

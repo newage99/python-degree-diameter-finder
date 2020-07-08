@@ -21,7 +21,13 @@ class SingleArgFunction(Function):
 
     @staticmethod
     def forbidden_prev_symbol(symbol) -> bool:
-        return str(symbol) == ')'
+        from symbols.numbers.Number import Number
+        return str(symbol) == ")" or isinstance(symbol, Number)
+
+    @staticmethod
+    def forbidden_next_symbol(symbol):
+        from symbols.interpretable_symbols.functions.operators.Operator import Operator
+        return isinstance(symbol, Operator) or str(symbol) == ")"
 
     @staticmethod
     def random(prev_symbol=None, exceptions=None, symbols=None):

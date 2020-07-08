@@ -215,6 +215,8 @@ class Id:
 
     @staticmethod
     def __add_or_remove_parenthesis_if_needed(id):
+        if isinstance(id, Symbol):
+            a = 0
         if len(id) > id.__initial_length or (len(id) == id.__initial_length and random_bool()):
             return Id.__remove_parenthesis_if_needed(id)
         else:
@@ -292,7 +294,8 @@ class Id:
         next_symbol = self[pos + 1] if pos + 1 < length else None
         worth_mutate_to_open = not self.__is_not_worth_mutate_to_open_parenthesis(pos)
         worth_mutate_to_close = not self.__is_not_worth_mutate_to_close_parenthesis(pos)
-        symbols = Symbol.symbols().copy().remove(self[pos])
+        symbols = Symbol.symbols().copy()
+        symbols.remove(self[pos])
         symbols_to_mutate_to = []
 
         for symbol in Symbol.symbols():
@@ -301,11 +304,15 @@ class Id:
                     (char == "(" and worth_mutate_to_open) or (char == ")" and worth_mutate_to_close))):
                 if symbol != self[pos] and Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol):
                     symbols_to_mutate_to.append(symbol)
-            else:
+            elif symbol in symbols:
                 symbols.remove(symbol)
 
         if len(symbols_to_mutate_to) > 0:
-            return Id(self.__symbols[:pos] + [random.choice(symbols_to_mutate_to)] + self.__symbols[pos+1:])
+            symbol_to_mutate_to = random.choice(symbols_to_mutate_to)
+            new_id = Id(self.__symbols[:pos] + [symbol_to_mutate_to] + self.__symbols[pos+1:])
+            if additional_data:
+                return [new_id, pos, str(self[pos]), str(symbol_to_mutate_to)]
+            return new_id
         else:
 
             prev_prev = self[pos - 2] if pos > 1 else None
@@ -325,10 +332,10 @@ class Id:
 
             final_symbol_list = random.choice(final_symbols)
             beginning = self.__symbols[:pos-(1 if prev_symbol else 0)]
-            ending = self.__symbols[pos+(1 if next_symbol else 0)]
+            ending = self.__symbols[pos+(2 if next_symbol else 1):]
             new_id = Id(beginning + final_symbol_list + ending)
             if additional_data:
-                return new_id, pos, str(self[pos]), str(final_symbol_list)
+                return [new_id, pos, str(self[pos]), str(final_symbol_list)]
             return new_id
 
     def mutate(self, additional_data: bool = False):
