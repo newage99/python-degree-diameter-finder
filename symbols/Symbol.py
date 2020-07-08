@@ -132,6 +132,10 @@ class Symbol(ABC):
 
     @staticmethod
     def check(first, second):
+        if not first:
+            return second.starting_symbol
+        if not second:
+            return first.ending_symbol
         return not first.forbidden_next_symbol(second) and not second.forbidden_prev_symbol(first)
 
     # -- MAGIC METHODS OVERRIDES -- #

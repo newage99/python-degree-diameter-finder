@@ -284,21 +284,63 @@ class Id:
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
         return new_id
 
+    def __replace_symbol_at_random_pos(self, additional_data: bool = False):
+
+        length = len(self)
+        pos = random.choice(range(length))
+        prev_symbol = self[pos - 1] if pos > 0 else None
+        next_symbol = self[pos + 1] if pos + 1 < length else None
+        worth_mutate_to_open = not self.__is_not_worth_mutate_to_open_parenthesis(pos)
+        worth_mutate_to_close = not self.__is_not_worth_mutate_to_close_parenthesis(pos)
+        symbols = Symbol.symbols().copy().remove(self[pos])
+        symbols_to_mutate_to = []
+
+        for symbol in Symbol.symbols():
+            char = str(symbol)
+            if ((char != "(" and char != ")") or (
+                    (char == "(" and worth_mutate_to_open) or (char == ")" and worth_mutate_to_close))):
+                if symbol != self[pos] and Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol):
+                    symbols_to_mutate_to.append(symbol)
+            else:
+                symbols.remove(symbol)
+
+        if len(symbols_to_mutate_to) > 0:
+            return Id(self.__symbols[:pos] + [random.choice(symbols_to_mutate_to)] + self.__symbols[pos+1:])
+        else:
+
+            prev_prev = self[pos - 2] if pos > 1 else None
+            next_next = self[pos + 2] if pos + 2 < length else None
+            final_symbols = []
+
+            for symbol1 in symbols:
+                for symbol2 in symbols:
+                    if Symbol.check(symbol1, symbol2):
+                        if Symbol.check(prev_prev, symbol1) and Symbol.check(symbol2, next_symbol):
+                            final_symbols.append([symbol1, symbol2, next_symbol] if next_symbol else [symbol1, symbol2])
+                        if Symbol.check(prev_symbol, symbol1) and Symbol.check(symbol2, next_next):
+                            final_symbols.append([prev_symbol, symbol1, symbol2] if prev_symbol else [symbol1, symbol2])
+
+            if len(final_symbols) == 0:
+                raise Exception
+
+            final_symbol_list = random.choice(final_symbols)
+            beginning = self.__symbols[:pos-(1 if prev_symbol else 0)]
+            ending = self.__symbols[pos+(1 if next_symbol else 0)]
+            new_id = Id(beginning + final_symbol_list + ending)
+            if additional_data:
+                return new_id, pos, str(self[pos]), str(final_symbol_list)
+            return new_id
+
     def mutate(self, additional_data: bool = False):
-        symbols_available_to_mutate_to = []
-        pos_to_mutate = -1
-        while len(symbols_available_to_mutate_to) == 0:
-            pos_to_mutate = random.choice(range(len(self)))
-            char_to_mutate = str(self[pos_to_mutate])
-            symbols_available_to_mutate_to = self.__get_symbols_available_to_mutate_to(pos_to_mutate)
-        symbol_to_mutate_to = random.choice(symbols_available_to_mutate_to)
-        final_symbols = self.__clean_symbol_to_mutate_to(pos_to_mutate, symbol_to_mutate_to)
-        symbol_list = self.__symbols[:pos_to_mutate] + final_symbols + self.__symbols[pos_to_mutate + 1:]
-        unchecked_parenthesis_new_id = Id(symbol_list)
-        new_id = Id.__add_or_remove_parenthesis_if_needed(unchecked_parenthesis_new_id)
+
         if additional_data:
-            return Id(new_id), pos_to_mutate, char_to_mutate, str(symbol_to_mutate_to)
-        return Id(new_id)
+            new_id, pos, char_to_mutate, char_to_mutate_to = self.__replace_symbol_at_random_pos(additional_data)
+        else:
+            new_id = self.__replace_symbol_at_random_pos()
+        new_id = Id.__add_or_remove_parenthesis_if_needed(new_id)
+        if additional_data:
+            return new_id, pos, char_to_mutate, char_to_mutate_to
+        return new_id
 
     # -- MAGIC METHODS OVERRIDES -- #
 
