@@ -6,6 +6,7 @@ from symbols.Symbol import Symbol
 from symbols.interpretable_symbols.CloseParenthesis import CloseParenthesis
 from symbols.interpretable_symbols.OpenParenthesis import OpenParenthesis
 from symbols.interpretable_symbols.functions.Function import Function
+from symbols.interpretable_symbols.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
 from symbols.numbers.Number import Number
 
 
@@ -93,7 +94,7 @@ class Id:
             if str(id[pos]) == ')':
                 pos -= 3
             elif (not prev_symbol or (isinstance(prev_symbol, Function) or str(prev_symbol) == "(")) and (
-                        isinstance(id[pos], Number) or str(id[pos]) == "("):
+                        isinstance(id[pos], Number) or isinstance(id[pos], SingleArgFunction) or str(id[pos]) == "("):
             # elif (prev_char in (Operator.operators() + "(") or prev_char == '') and id[pos] in (numbers + "("):
                 positions_to_insert_open_parenthesis.append(pos)
             pos -= 1
@@ -175,7 +176,7 @@ class Id:
         if len(positions_to_remove_open_parenthesis) > 0:
             pos_to_remove = random.choice(positions_to_remove_open_parenthesis)
             return Id(id[:pos_to_remove] + id[pos_to_remove + 1:])
-        raise Exception
+        return None
 
     @staticmethod
     def __remove_close_parenthesis_until_pos(id, pos):
@@ -209,7 +210,11 @@ class Id:
                     else:
                         parenthesis_counter -= 1
             if not parenthesis_removed and parenthesis_counter > 0:
-                id = Id.__remove_open_parenthesis(id)
+                new_id = Id.__remove_open_parenthesis(id)
+                if new_id:
+                    id = new_id
+                else:
+                    id = Id.__insert_close_parenthesis_from_pos(id, str(id).rfind('(') + 4)
                 parenthesis_removed = True
         return id
 
@@ -350,6 +355,9 @@ class Id:
         return new_id
 
     # -- MAGIC METHODS OVERRIDES -- #
+
+    def __eq__(self, other):
+        return str(self) == str(other)
 
     def __str__(self):
         return ''.join([str(symbol) for symbol in self.__symbols])

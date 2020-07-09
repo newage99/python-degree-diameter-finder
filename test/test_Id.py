@@ -75,7 +75,7 @@ class IdTest(unittest.TestCase):
         #         print('OK')
 
     def test_mutate(self):
-        ids_lengths = [6, 10, 25, 100]
+        ids_lengths = [6, 10, 25, 50, 100, 250, 500, 1000]
         ids_per_length = 5
         mutations_per_id = 20
 
