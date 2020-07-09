@@ -112,7 +112,6 @@ class Id:
             prev_symbol = id[pos - 1] if pos > 0 else None
             if str(id[pos]) == '(':
                 pos += 3
-
             elif (prev_symbol and (isinstance(prev_symbol, Number) or str(prev_symbol) == ")")) and (
                         isinstance(id[pos], Function) or str(id[pos]) == ")"):
             # elif prev_char in (numbers + ")") and id[pos] in (Operator.operators() + ")"):
@@ -120,32 +119,32 @@ class Id:
             pos += 1
         positions_to_insert_close_parenthesis.append(len_id)
         pos = random.choice(positions_to_insert_close_parenthesis)
-        if pos == len_id:
-            return Id(id + CloseParenthesis())
-        return Id(id[:pos] + [CloseParenthesis()] + id[pos:])
+        new_id = Id(id[:pos] + [CloseParenthesis()] + id[pos:])
+        return new_id
 
     @staticmethod
     def __add_parenthesis_if_needed(id):
         parenthesis_inserted = True
+        new_id = id.copy()
         while parenthesis_inserted:
             parenthesis_inserted = False
             parenthesis_counter = 0
-            for i in range(len(id)):
-                char = str(id[i])
+            for i in range(len(new_id)):
+                char = str(new_id[i])
                 if char == '(':
                     parenthesis_counter += 1
                 elif char == ')':
                     if parenthesis_counter == 0:
-                        id = Id.__insert_open_parenthesis_until_pos(id, i - 3)
+                        new_id = Id.__insert_open_parenthesis_until_pos(new_id, i - 3)
                         parenthesis_inserted = True
                         break
                     else:
                         parenthesis_counter -= 1
             # This means there has been one or more open parenthesis not closed.
             if not parenthesis_inserted and parenthesis_counter > 0:
-                id = Id.__insert_close_parenthesis_from_pos(id, str(id).rfind('(') + 4)
+                new_id = Id.__insert_close_parenthesis_from_pos(new_id, str(new_id).rfind('(') + 4)
                 parenthesis_inserted = True
-        return id
+        return new_id
 
     @staticmethod
     def __remove_open_parenthesis(id):
@@ -220,8 +219,6 @@ class Id:
 
     @staticmethod
     def __add_or_remove_parenthesis_if_needed(id):
-        if isinstance(id, Symbol):
-            a = 0
         if len(id) > id.__initial_length or (len(id) == id.__initial_length and random_bool()):
             return Id.__remove_parenthesis_if_needed(id)
         else:
@@ -346,15 +343,18 @@ class Id:
     def mutate(self, additional_data: bool = False):
 
         if additional_data:
-            new_id, pos, char_to_mutate, char_to_mutate_to = self.__replace_symbol_at_random_pos(additional_data)
+            unchecked_id, pos, char_to_mutate, char_to_mutate_to = self.__replace_symbol_at_random_pos(additional_data)
         else:
-            new_id = self.__replace_symbol_at_random_pos()
-        new_id = Id.__add_or_remove_parenthesis_if_needed(new_id)
+            unchecked_id = self.__replace_symbol_at_random_pos()
+        new_id = Id.__add_or_remove_parenthesis_if_needed(unchecked_id)
         if additional_data:
             return new_id, pos, char_to_mutate, char_to_mutate_to
         return new_id
 
     # -- MAGIC METHODS OVERRIDES -- #
+
+    def copy(self):
+        return Id(self.__symbols.copy())
 
     def __eq__(self, other):
         return str(self) == str(other)
