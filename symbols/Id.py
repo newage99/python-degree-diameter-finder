@@ -12,9 +12,9 @@ from symbols.numbers.Number import Number
 
 class Id:
 
-    def __init__(self, symbols=None):
+    def __init__(self, symbols=None, initial_length: int = None):
         self.__symbols = symbols if symbols else []
-        self.__initial_length = len(self.__symbols)
+        self.__initial_length = initial_length if initial_length else len(self.__symbols)
 
     # -- PRIVATE METHODS -- #
 
@@ -36,7 +36,8 @@ class Id:
             pos -= 1
         if len(positions) > 0:
             pos = random.choice(positions)
-            return Id(id[:pos] + ([OpenParenthesis()] + id[pos:] if insert_or_remove else id[pos + 1:]))
+            return Id(id[:pos] + ([OpenParenthesis()] + id[pos:] if insert_or_remove else id[pos + 1:]),
+                      id.__initial_length)
         raise Exception
 
     @staticmethod
@@ -53,7 +54,7 @@ class Id:
             pos += 1
         positions_to_insert_close_parenthesis.append(len_id)
         pos = random.choice(positions_to_insert_close_parenthesis)
-        new_id = Id(id[:pos] + [CloseParenthesis()] + id[pos:])
+        new_id = Id(id[:pos] + [CloseParenthesis()] + id[pos:], id.__initial_length)
         return new_id
 
     @staticmethod
@@ -87,7 +88,7 @@ class Id:
             pos += 1
         if len(positions_to_remove_open_parenthesis) > 0:
             pos_to_remove = random.choice(positions_to_remove_open_parenthesis)
-            return Id(id[:pos_to_remove] + id[pos_to_remove + 1:])
+            return Id(id[:pos_to_remove] + id[pos_to_remove + 1:], id.__initial_length)
         elif len(conflicting_open_parenthesis_positions) > 0:
             new_id = id.copy()
             for pos in conflicting_open_parenthesis_positions:
@@ -177,7 +178,7 @@ class Id:
             elif str(new_symbol) == ")":
                 parenthesis_counter -= 1
             new_id.append(new_symbol)
-        return Id(new_id)
+        return Id(new_id, length)
 
     @staticmethod
     def random_connected_id():
@@ -188,61 +189,81 @@ class Id:
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
         return new_id
 
-    def __replace_symbol_at_pos(self, pos: int, additional_data: bool = False):
+    def __remove_symbol_at_pos(self, pos: int, additional_data: bool = False):
+        pass
+
+    def __insert_symbol_at_pos(self, pos: int, additional_data: bool = False):
+        pass
+
+    def __manage_symbol_at_pos(self, pos: int, additional_data: bool = False):
+        equal = len(self) == self.__initial_length
+        bigger = len(self) > self.__initial_length
         length = len(self)
         prev_symbol = self[pos - 1] if pos > 0 else None
         next_symbol = self[pos + 1] if pos + 1 < length else None
-        worth_mutate_to_open = not self.__is_not_worth_mutate_to_open_parenthesis(pos)
-        worth_mutate_to_close = not self.__is_not_worth_mutate_to_close_parenthesis(pos)
+        prev_prev = self[pos - 2] if pos > 1 else None
+        next_next = self[pos + 2] if pos + 2 < length else None
         symbols = Symbol.symbols().copy()
         symbols.remove(self[pos])
-        symbols_to_mutate_to = []
+        if OpenParenthesis() in symbols and self.__is_not_worth_mutate_to_open_parenthesis(pos):
+            symbols.remove(OpenParenthesis())
+        if CloseParenthesis() in symbols and self.__is_not_worth_mutate_to_close_parenthesis(pos):
+            symbols.remove(CloseParenthesis())
 
-        for symbol in Symbol.symbols():
-            char = str(symbol)
-            if ((char != "(" and char != ")") or (
-                    (char == "(" and worth_mutate_to_open) or (char == ")" and worth_mutate_to_close))):
-                if symbol != self[pos] and Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol):
-                    symbols_to_mutate_to.append(symbol)
-            elif symbol in symbols:
-                symbols.remove(symbol)
-
-        if len(symbols_to_mutate_to) > 0:
-            symbol_to_mutate_to = random.choice(symbols_to_mutate_to)
-            new_id = Id(self.__symbols[:pos] + [symbol_to_mutate_to] + self.__symbols[pos+1:])
+        if bigger and Symbol.check(prev_symbol, next_symbol):
+            new_id = Id(self[:pos] + self[pos + 1:], self.__initial_length)
             if additional_data:
-                return [new_id, pos, str(self[pos]), str(symbol_to_mutate_to)]
+                return new_id, pos, str(self[pos]), 'None'
             return new_id
         else:
-
-            prev_prev = self[pos - 2] if pos > 1 else None
-            next_next = self[pos + 2] if pos + 2 < length else None
-            final_symbols = []
-
-            for symbol1 in symbols:
-                for symbol2 in symbols:
-                    if Symbol.check(symbol1, symbol2):
-                        if Symbol.check(prev_prev, symbol1) and Symbol.check(symbol2, next_symbol):
-                            final_symbols.append([symbol1, symbol2, next_symbol] if next_symbol else [symbol1, symbol2])
-                        if Symbol.check(prev_symbol, symbol1) and Symbol.check(symbol2, next_next):
-                            final_symbols.append([prev_symbol, symbol1, symbol2] if prev_symbol else [symbol1, symbol2])
-
-            if len(final_symbols) == 0:
+            symbols_to_mutate_to = []
+            for symbol in symbols:
+                if bigger:
+                    if Symbol.check(prev_prev, symbol) and Symbol.check(symbol, next_symbol):
+                        symbols_to_mutate_to.append([symbol, next_symbol] if next_symbol else [symbol])
+                    elif Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_next):
+                        symbols_to_mutate_to.append([prev_symbol, symbol] if prev_symbol else [symbol])
+                elif Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol if equal else self[pos]):
+                    symbols_to_mutate_to.append([symbol])
+            if len(symbols_to_mutate_to) > 0:
+                symbols_to_mutate_to = random.choice(symbols_to_mutate_to)
+                ending = self[pos + (2 if bigger else (1 if equal else 0)):]
+                beginning = self[:pos-(1 if bigger and pos > 0 else 0)]
+                new_id = Id(beginning + symbols_to_mutate_to + ending, self.__initial_length)
+                if additional_data:
+                    return new_id, pos, str(self[pos]), str([str(s) for s in symbols_to_mutate_to])
+                return new_id
+            elif bigger:
                 raise Exception
+            else:
 
-            final_symbol_list = random.choice(final_symbols)
-            beginning = self.__symbols[:pos-(1 if prev_symbol else 0)]
-            ending = self.__symbols[pos+(2 if next_symbol else 1):]
-            new_id = Id(beginning + final_symbol_list + ending)
-            if additional_data:
-                return new_id, pos, str(self[pos]), str([str(s) for s in final_symbol_list])
-            return new_id
+                final_symbols = []
+                last_s = next_symbol if equal else self[pos]
+                first_s = prev_symbol if equal else self[pos]
+
+                for s1 in symbols:
+                    for s2 in symbols:
+                        if Symbol.check(s1, s2):
+                            if Symbol.check(prev_prev if equal else prev_symbol, s1) and Symbol.check(s2, last_s):
+                                final_symbols.append([s1, s2, last_s] if next_symbol else [s1, s2])
+                            if Symbol.check(first_s, s1) and Symbol.check(s2, next_next if equal else next_symbol):
+                                final_symbols.append([first_s, s1, s2] if prev_symbol else [s1, s2])
+
+                if len(final_symbols) == 0:
+                    raise Exception
+
+                final_symbol_list = random.choice(final_symbols)
+                new_id = Id(self[:pos - (1 if equal else 0)] + final_symbol_list + self[pos + (2 if equal else 1):],
+                            self.__initial_length)
+                if additional_data:
+                    return new_id, pos, str(self[pos]), str([str(s) for s in final_symbol_list])
+                return new_id
 
     def __mutate(self, pos, additional_data: bool):
         if additional_data:
-            unchecked_id, pos, char_to_mutate, char_to_mutate_to = self.__replace_symbol_at_pos(pos, additional_data)
+            unchecked_id, pos, char_to_mutate, char_to_mutate_to = self.__manage_symbol_at_pos(pos, additional_data)
         else:
-            unchecked_id = self.__replace_symbol_at_pos(pos)
+            unchecked_id = self.__manage_symbol_at_pos(pos)
         new_id = Id.__add_or_remove_parenthesis_if_needed(unchecked_id)
         if additional_data:
             return new_id, pos, char_to_mutate, char_to_mutate_to
@@ -255,7 +276,7 @@ class Id:
     # -- MAGIC METHODS OVERRIDES -- #
 
     def copy(self):
-        return Id(self.__symbols.copy())
+        return Id(self.__symbols.copy(), self.__initial_length)
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -271,11 +292,11 @@ class Id:
 
     def __add__(self, other):
         if other is None:
-            return Id(self.__symbols)
+            return Id(self.__symbols, self.__initial_length)
         else:
             class_name = other.__class__.__name__
             if class_name == "Id":
-                return Id(self.__symbols + other.__symbols)
+                return Id(self.__symbols + other.__symbols, self.__initial_length)
             elif isinstance(other, Symbol):
-                return Id(self.__symbols + [other])
+                return Id(self.__symbols + [other], self.__initial_length)
         return None

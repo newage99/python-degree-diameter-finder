@@ -88,13 +88,15 @@ class IdTest(unittest.TestCase):
                 print('Testing ' + str(mutations_per_id) + ' mutations on id #' + str(
                     i) + ' ' + str(id) + ' of length ' + str(length) + '...')
                 for t in range(mutations_per_id):
-                    final_id, pos, char_to_mutate, char_to_mutate_to = id.mutate(True)
+                    prev_id = id.copy()
+                    id, pos, char_to_mutate, char_to_mutate_to = id.mutate(True)
                     # final_id = id.mutate(True)
-                    check_id(self=self, id=final_id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
+                    check_id(self=self, id=id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
                              char_to_mutate_to=char_to_mutate_to)
                     # check_id(self=self, id=final_id)
-                    print('  ' + str(id) + " -> " + str(final_id) + " OK  " + str(
-                        pos) + "  " + char_to_mutate + "  " + char_to_mutate_to)
+                    print('  ' + str(prev_id) + " -> " + str(id) + " OK  pos=" + str(
+                        pos) + "  char_to_mutate=" + char_to_mutate + "  char_to_mutate_to=" + char_to_mutate_to + "  length=" + str(
+                        len(id)))
 
 
 if __name__ == "__main__":
