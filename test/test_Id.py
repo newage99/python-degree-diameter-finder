@@ -67,20 +67,20 @@ class IdTest(unittest.TestCase):
         ids_lengths = [3, 4, 5, 6, 25, 50, 100]
         ids_per_length = 25
 
-        for length in ids_lengths:
-            print('')
-            print('Testing ids with length=' + str(length))
-            print('')
-            for i in range(1, ids_per_length + 1):
-                id = Id.random(length)
-                print('Checking id=' + str(id), end=" ")
-                check_id(self=self, id=id)
-                print('OK')
+        # for length in ids_lengths:
+        #     print('')
+        #     print('Testing ids with length=' + str(length))
+        #     print('')
+        #     for i in range(1, ids_per_length + 1):
+        #         id = Id.random(length)
+        #         print('Checking id=' + str(id), end=" ")
+        #         check_id(self=self, id=id)
+        #         print('OK')
 
     def test_mutate(self):
-        ids_lengths = [3, 4, 5, 6, 25, 50, 100]
-        ids_per_length = 5
-        mutations_per_id = 20
+        ids_lengths = [6, 10, 25, 50, 100]
+        ids_per_length = 20
+        mutations_per_id = 40
 
         for length in ids_lengths:
             for i in range(1, ids_per_length + 1):
@@ -93,8 +93,8 @@ class IdTest(unittest.TestCase):
                     check_id(self=self, id=final_id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
                              char_to_mutate_to=char_to_mutate_to)
                     # check_id(self=self, id=final_id)
-                    print('  ' + str(id) + " -> " + str(final_id) + " OK")
-                print('OK')
+                    print('  ' + str(id) + " -> " + str(final_id) + " OK  " + str(
+                        pos) + "  " + char_to_mutate + "  " + char_to_mutate_to)
 
 
 if __name__ == "__main__":
