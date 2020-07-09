@@ -1,5 +1,6 @@
 import random
 
+from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
 from misc.Random import random_bool
 from misc.config import wanted_length
 from symbols.Symbol import Symbol
@@ -189,13 +190,8 @@ class Id:
             matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(id)
         return new_id
 
-    def __remove_symbol_at_pos(self, pos: int, additional_data: bool = False):
-        pass
-
-    def __insert_symbol_at_pos(self, pos: int, additional_data: bool = False):
-        pass
-
     def __manage_symbol_at_pos(self, pos: int, additional_data: bool = False):
+        smaller = len(self) < self.__initial_length
         equal = len(self) == self.__initial_length
         bigger = len(self) > self.__initial_length
         length = len(self)
@@ -217,6 +213,7 @@ class Id:
             return new_id
         else:
             symbols_to_mutate_to = []
+
             for symbol in symbols:
                 if bigger:
                     if Symbol.check(prev_prev, symbol) and Symbol.check(symbol, next_symbol):
@@ -225,7 +222,9 @@ class Id:
                         symbols_to_mutate_to.append([prev_symbol, symbol] if prev_symbol else [symbol])
                 elif Symbol.check(prev_symbol, symbol) and Symbol.check(symbol, next_symbol if equal else self[pos]):
                     symbols_to_mutate_to.append([symbol])
+
             if len(symbols_to_mutate_to) > 0:
+
                 symbols_to_mutate_to = random.choice(symbols_to_mutate_to)
                 ending = self[pos + (2 if bigger else (1 if equal else 0)):]
                 beginning = self[:pos-(1 if bigger and pos > 0 else 0)]
@@ -233,28 +232,28 @@ class Id:
                 if additional_data:
                     return new_id, pos, str(self[pos]), str([str(s) for s in symbols_to_mutate_to])
                 return new_id
-            elif bigger:
-                raise Exception
+
             else:
 
                 final_symbols = []
-                last_s = next_symbol if equal else self[pos]
+                last_s = next_symbol if equal else (self[pos] if smaller else next_next)
                 first_s = prev_symbol if equal else self[pos]
 
                 for s1 in symbols:
                     for s2 in symbols:
                         if Symbol.check(s1, s2):
-                            if Symbol.check(prev_prev if equal else prev_symbol, s1) and Symbol.check(s2, last_s):
-                                final_symbols.append([s1, s2, last_s] if next_symbol else [s1, s2])
+                            if Symbol.check(prev_symbol if smaller else prev_prev, s1) and Symbol.check(s2, last_s):
+                                final_symbols.append([s1, s2, last_s] if next_symbol and not bigger else [s1, s2])
                             if Symbol.check(first_s, s1) and Symbol.check(s2, next_next if equal else next_symbol):
-                                final_symbols.append([first_s, s1, s2] if prev_symbol else [s1, s2])
+                                final_symbols.append([first_s, s1, s2] if prev_symbol and not bigger else [s1, s2])
 
                 if len(final_symbols) == 0:
                     raise Exception
 
                 final_symbol_list = random.choice(final_symbols)
-                new_id = Id(self[:pos - (1 if equal else 0)] + final_symbol_list + self[pos + (2 if equal else 1):],
-                            self.__initial_length)
+                beginning = self[:pos - (0 if smaller else 1)]
+                ending = self[pos + (1 if smaller else 2):]
+                new_id = Id(beginning + final_symbol_list + ending, self.__initial_length)
                 if additional_data:
                     return new_id, pos, str(self[pos]), str([str(s) for s in final_symbol_list])
                 return new_id
@@ -272,6 +271,27 @@ class Id:
     def mutate(self, additional_data: bool = False):
         pos = random.choice(range(len(self)))
         return self.__mutate(pos, additional_data)
+
+    def mutate_to_connected_matrix_id(self, prohibited_ids=None):
+        if prohibited_ids is None:
+            prohibited_ids = []
+        connected = False
+        while not connected:
+            prohibited_id = True
+            while prohibited_id:
+                mutated_id = self.mutate()
+                prohibited_id = mutated_id in prohibited_ids
+            matrix, connected = AdjacencyMatrixGenerator.generate_and_get_if_its_connected(mutated_id)
+        return mutated_id, matrix
+
+    @staticmethod
+    def parse(id_str):
+        prev_symbol = None
+        symbols = []
+        for char in id_str:
+            symbols.append(Symbol.parse(char, prev_symbol))
+            prev_symbol = symbols[-1]
+        return Id(symbols)
 
     # -- MAGIC METHODS OVERRIDES -- #
 

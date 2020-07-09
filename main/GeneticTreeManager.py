@@ -30,10 +30,10 @@ class GeneticTreeManager:
 
     @staticmethod
     def print_successful_mutation(father_or_child: str, tree, new_tree, j):
-        print(" " + father_or_child + " Tree " + str(j) + ":  " + tree.id + "  (degree=" + str(tree.degree) +
-              ", diameter=" + str(tree.diameter) + ", score1=" + str(tree.score1) + ") mutated to  " + new_tree.id +
-              "  (degree=" + str(new_tree.degree) + ", diameter=" + str(new_tree.diameter) + ", score1=" +
-              str(new_tree.score1) + ")")
+        print(" " + father_or_child + " Tree " + str(j) + ":  " + str(tree.id) + "  (degree=" + str(tree.degree) +
+              ", diameter=" + str(tree.diameter) + ", score1=" + str(tree.score1) + ") mutated to  " +
+              str(new_tree.id) + "  (degree=" + str(new_tree.degree) + ", diameter=" + str(new_tree.diameter) +
+              ", score1=" + str(new_tree.score1) + ")")
 
     @staticmethod
     def run(iterations: int, number_of_trees: int, trees_list: list = None):
@@ -44,7 +44,7 @@ class GeneticTreeManager:
             if trees_list:
                 GeneticTreeManager.initial_trees = trees_list
             while len(GeneticTreeManager.initial_trees) < number_of_trees:
-                new_tree = GeneticTree(str(Id.random_connected_id()))
+                new_tree = GeneticTree(Id.random_connected_id())
                 GeneticTreeManager.initial_trees.append(new_tree)
             GeneticTreeManager.trees = []
             for tree in GeneticTreeManager.initial_trees:

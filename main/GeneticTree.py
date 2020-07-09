@@ -1,13 +1,14 @@
 import math
-from misc.config import max_number_of_children
-from main.IdMutator import IdMutator
+
 from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 from main.AdjacencyMatrixGenerator import AdjacencyMatrixGenerator
+from misc.config import max_number_of_children
+from symbols.Id import Id
 
 
 class GeneticTree:
 
-    def __init__(self, id: str, iteration: int = -1, children=None, degree: int = -1, diameter: int = -1,
+    def __init__(self, id: Id, iteration: int = -1, children=None, degree: int = -1, diameter: int = -1,
                  score1: int = -1):
         self.id = id
         self.__initial_iteration = iteration
@@ -82,10 +83,8 @@ class GeneticTree:
     def mutate(self, child: bool = True):
         self.iteration += 1
         number_of_mutations = self.number_of_mutations()
-        mutated_id = self.id
         for i in range(number_of_mutations):
-            mutated_id, matrix = IdMutator.mutate_to_connected_matrix_id(mutated_id,
-                                                                         prohibited_ids=self.get_children_ids())
+            mutated_id, matrix = self.id.mutate_to_connected_matrix_id(prohibited_ids=self.get_children_ids())
             score = DegreeAndDiameterCalculator.calculate(matrix)
             score_better_than_self = self.is_score_better_than_self(score)
             score_equal_than_self = self.is_score_equal_than_self(score)
@@ -117,8 +116,8 @@ class GeneticTree:
         if 'children' in obj and len(obj['children']) > 0:
             for child in obj['children']:
                 children.append(GeneticTree.from_dict(child))
-        return GeneticTree(id=obj['id'], iteration=iteration, children=children, degree=degree, diameter=diameter,
-                           score1=score1)
+        return GeneticTree(id=Id.parse(obj['id']), iteration=iteration, children=children, degree=degree,
+                           diameter=diameter, score1=score1)
 
     def to_json(self, indentation_exponent=1):
         indent = '\t' * indentation_exponent

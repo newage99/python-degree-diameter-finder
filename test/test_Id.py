@@ -67,15 +67,15 @@ class IdTest(unittest.TestCase):
         ids_lengths = [3, 4, 5, 6, 25, 50, 100]
         ids_per_length = 25
 
-        # for length in ids_lengths:
-        #     print('')
-        #     print('Testing ids with length=' + str(length))
-        #     print('')
-        #     for i in range(1, ids_per_length + 1):
-        #         id = Id.random(length)
-        #         print('Checking id=' + str(id), end=" ")
-        #         check_id(self=self, id=id)
-        #         print('OK')
+        for length in ids_lengths:
+            print('')
+            print('Testing ids with length=' + str(length))
+            print('')
+            for i in range(1, ids_per_length + 1):
+                id = Id.random(length)
+                print('Checking id=' + str(id), end=" ")
+                check_id(self=self, id=id)
+                print('OK')
 
     def test_mutate(self):
         ids_lengths = [6, 10, 25, 50, 100]
