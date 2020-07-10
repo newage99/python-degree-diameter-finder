@@ -22,7 +22,7 @@ class GeneticTreeManager:
             if trees_list:
                 GeneticTreeManager.initial_trees = trees_list
             while len(GeneticTreeManager.initial_trees) < number_of_trees:
-                adjacency_matrix = AdjacencyMatrix([[0]])
+                adjacency_matrix = AdjacencyMatrix.create_unconnected_matrix()
                 while not adjacency_matrix.is_connected():
                     new_id = Id.random()
                     adjacency_matrix = AdjacencyMatrix.parse(new_id)

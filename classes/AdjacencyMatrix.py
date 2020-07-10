@@ -30,8 +30,12 @@ class AdjacencyMatrix:
                 number_of_components += 1
                 if number_of_components >= 2:
                     break
-            self.__is_connected = number_of_components == 1 and first_component_length == n and n > 1
+            self.__is_connected = number_of_components == 1 and first_component_length == n
         return self.__is_connected
+
+    @staticmethod
+    def create_unconnected_matrix():
+        return AdjacencyMatrix([[0, 0], [0, 0]])
 
     @staticmethod
     def parse(id: Id, n: int = number_of_nodes):
