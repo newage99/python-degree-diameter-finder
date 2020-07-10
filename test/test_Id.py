@@ -89,7 +89,7 @@ class IdTest(unittest.TestCase):
                     i) + ' ' + str(id) + ' of length ' + str(length) + '...')
                 for t in range(mutations_per_id):
                     prev_id = id.copy()
-                    id, pos, char_to_mutate, char_to_mutate_to = id.mutate(True)
+                    id, pos, char_to_mutate, char_to_mutate_to = id.mutate(additional_data=True)
                     # final_id = id.mutate(True)
                     check_id(self=self, id=id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
                              char_to_mutate_to=char_to_mutate_to)

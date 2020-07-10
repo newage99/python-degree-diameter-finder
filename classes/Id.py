@@ -1,13 +1,13 @@
 import random
 
-from misc.Random import random_bool
-from misc.config import wanted_length
 from classes.Symbol import Symbol
 from classes.interpretable_symbols.CloseParenthesis import CloseParenthesis
 from classes.interpretable_symbols.OpenParenthesis import OpenParenthesis
 from classes.interpretable_symbols.functions.Function import Function
 from classes.interpretable_symbols.functions.single_arg_functions.SingleArgFunction import SingleArgFunction
 from classes.numbers.Number import Number
+from misc.config import wanted_length
+from misc.Random import random_bool
 
 
 class Id:
@@ -180,6 +180,15 @@ class Id:
             new_id.append(new_symbol)
         return Id(new_id, length)
 
+    @staticmethod
+    def random_connected_id():
+        from classes.AdjacencyMatrix import AdjacencyMatrix
+        adjacency_matrix = AdjacencyMatrix.create_unconnected_matrix()
+        while not adjacency_matrix.is_connected():
+            new_id = Id.random()
+            adjacency_matrix = AdjacencyMatrix.parse(new_id)
+        return new_id
+
     def __manage_symbol_at_pos(self, pos: int, additional_data: bool = False):
         smaller = len(self) < self.__initial_length
         equal = len(self) == self.__initial_length
@@ -258,8 +267,9 @@ class Id:
             return new_id, pos, char_to_mutate, char_to_mutate_to
         return new_id
 
-    def mutate(self, additional_data: bool = False):
-        pos = random.choice(range(len(self)))
+    def mutate(self, pos: int = None, additional_data: bool = False):
+        if not pos:
+            pos = random.choice(range(len(self)))
         return self.__mutate(pos, additional_data)
 
     @staticmethod

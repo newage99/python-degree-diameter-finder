@@ -69,4 +69,8 @@ class ExpressionInterpreter:
                 char, number_or_symbol = ExpressionInterpreter.__get_next_number_or_symbol(number_or_symbol)
         except Exception as e:
             return 0
-        return globals.numbers[0][0]
+        try:
+            return globals.numbers[0][0]
+        except Exception as e:
+            a = 0
+        return 0
