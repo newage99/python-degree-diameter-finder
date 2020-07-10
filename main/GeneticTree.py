@@ -1,3 +1,5 @@
+import math
+
 from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 from classes.AdjacencyMatrix import AdjacencyMatrix
 from classes.Id import Id
@@ -66,14 +68,21 @@ class GeneticTree:
 
     def to_json(self, indentation_exponent=1):
         indent = '\t' * indentation_exponent
-        ret = "{\n" + indent + '"ids": [\n'
+        ret = "{\n" + indent + '"ids": [\n' + indent + "\t"
+        ids_line_break_frequency = round(math.sqrt(len(self.ids)))
+        c = 0
         for i in range(len(self.ids)):
-            ret += indent + '\t"' + str(self.ids[i]) + '"'
+            ret += '"' + str(self.ids[i]) + '"'
             if i+1 < len(self.ids):
-                ret += ","
-            ret += "\n"
-        ret += indent + '],\n' + indent + '"degree": ' + str(self.degree) + ",\n" + indent + '"diameter": ' + str(
-            self.diameter) + ",\n" + indent + '"score1": ' + str(self.score1) + ",\n" + indent + '"child": '
+                ret += ", "
+            if c == ids_line_break_frequency:
+                ret += "\n" + indent + "\t"
+                c = 0
+            else:
+                c += 1
+        ret += "\n" + indent + '],\n' + indent + '"degree": ' + str(
+            self.degree) + ",\n" + indent + '"diameter": ' + str(self.diameter) + ",\n" + indent + '"score1": ' + str(
+            self.score1) + ",\n" + indent + '"child": '
         if self.child:
             ret += self.child.to_json(indentation_exponent + 1)
         else:
