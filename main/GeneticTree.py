@@ -12,8 +12,6 @@ class GeneticTree:
         self.child = child
         if degree == -1:
             score = DegreeAndDiameterCalculator.calculate(AdjacencyMatrix.parse(ids[0]))
-            if not score:
-                a = 0
             degree = score[0]
             diameter = score[1]
             score1 = score[2] + score[3]
@@ -44,9 +42,6 @@ class GeneticTree:
         return new_score0 == self.score0 and score1_equal_than_actual
 
     def get_non_existing_id(self, id_to_mutate: Id):
-        from classes.Symbol import Symbol
-        if isinstance(id_to_mutate, Symbol):
-            a = 0
         mutated_id = id_to_mutate
         c = 0
         while mutated_id in self.ids and c < 10:
@@ -55,26 +50,24 @@ class GeneticTree:
         return mutated_id
 
     def mutate(self):
+        equal_list = []
         for id in self.ids:
             mutated_id = self.get_non_existing_id(id)
             if mutated_id not in self.ids:
                 adjacency_matrix = AdjacencyMatrix.parse(mutated_id)
                 if adjacency_matrix.is_connected():
                     score = DegreeAndDiameterCalculator.calculate(adjacency_matrix)
-                    score_better_than_self = self.is_score_better_than_self(score)
-                    score_equal_than_self = self.is_score_equal_than_self(score)
-                    if score_better_than_self or score_equal_than_self:
-                        tree_to_return = self
-                        if score_better_than_self:
-                            new_tree = GeneticTree([mutated_id], degree=score[0], diameter=score[1],
-                                                   score1=score[2] + score[3])
-                            self.child = new_tree
-                            tree_to_return = new_tree
-                        else:
-                            self.ids.append(mutated_id)
-                        self.iterations_without_change = 0
-                        return tree_to_return
-        self.iterations_without_change += 1
+                    if self.is_score_better_than_self(score):
+                        new_tree = GeneticTree([mutated_id], degree=score[0], diameter=score[1],
+                                               score1=score[2] + score[3])
+                        self.child = new_tree
+                        return new_tree
+                    elif self.is_score_equal_than_self(score):
+                        equal_list.append(mutated_id)
+        if len(equal_list) > 0:
+            self.ids += equal_list
+        else:
+            self.iterations_without_change += 1
         return self
 
     @staticmethod

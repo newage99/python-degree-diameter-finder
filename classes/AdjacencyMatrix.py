@@ -1,3 +1,4 @@
+import math
 import networkx
 
 from classes.Id import Id
@@ -51,7 +52,7 @@ class AdjacencyMatrix:
                 result = ExpressionInterpreter.compute(expression)
                 if result == float("inf"):
                     result = 1
-                elif result == float("-inf"):
+                elif result == float("-inf") or math.isnan(result):
                     result = 0
                 result = round(result)
                 if result > 0:

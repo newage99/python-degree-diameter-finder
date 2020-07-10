@@ -82,6 +82,9 @@ class GeneticTreeManager:
         GeneticTreeManager.__init_trees(number_of_trees, trees_list)
 
         for i in range(iterations):
+            if i % save_results_frequency == 0:
+                print("Auto-saving results... (Saving frequency: " + str(save_results_frequency) + " iterations)")
+                GeneticTreeManager.save_tree_list()
             print("Iteration " + str(i) + "/" + str(iterations - 1) + "...")
             sys.stdout.flush()
             for j in range(len(GeneticTreeManager.trees)):
@@ -104,8 +107,5 @@ class GeneticTreeManager:
                     # if tree.iterations_without_change >= iterations_without_change_before_preparing_to_delete and \
                     #         GeneticTreeManager.there_is_prepared_to_delete_tree_better_or_equal_than(tree):
                     #     GeneticTreeManager.delete_tree(j)
-            if 0 < i < iterations - 1 and i % save_results_frequency == 0:
-                print("Auto-saving results... (Saving frequency: " + str(save_results_frequency) + " iterations)")
-                GeneticTreeManager.save_tree_list()
         print("Saving final results...")
         GeneticTreeManager.save_tree_list()
