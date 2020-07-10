@@ -29,9 +29,7 @@ class DegreeAndDiameterCalculator:
     def calculate(matrix):
 
         len_matrix = len(matrix)
-        number_of_neighbours = []
-        for i in range(0, len_matrix):
-            number_of_neighbours.append(sum(matrix[i]))
+        number_of_neighbours = [sum(row) for row in matrix]
 
         degree = 0
         diameter = 0

@@ -1,4 +1,5 @@
 import unittest
+from classes.AdjacencyMatrix import AdjacencyMatrix
 from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
 
 
@@ -16,13 +17,21 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
               [0, 0, 1, 0, 1, 0, 0, 1, 0, 0], [0, 0, 0, 1, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 1, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
               [1, 0, 0, 0, 0, 0, 0, 1, 0, 0]]
+    custom = AdjacencyMatrix(custom)
 
     custom_distance_1_pairs = [[0, 1], [0, 9], [1, 2], [2, 3], [2, 5], [3, 4], [3, 7], [4, 5], [4, 6], [7, 8], [7, 9]]
+    custom_distance_1_pairs = AdjacencyMatrix(custom_distance_1_pairs)
+
     custom_distance_2_pairs = [[0, 2], [0, 7], [1, 3], [1, 5], [1, 9], [2, 4], [2, 7], [3, 5], [3, 6], [3, 8], [3, 9],
                                [4, 7], [5, 6], [8, 9]]
+    custom_distance_2_pairs = AdjacencyMatrix(custom_distance_2_pairs)
+
     custom_distance_3_pairs = [[0, 3], [0, 5], [0, 8], [1, 4], [1, 7], [2, 6], [2, 8], [2, 9], [4, 8], [4, 9], [5, 7],
                                [6, 7]]
+    custom_distance_3_pairs = AdjacencyMatrix(custom_distance_3_pairs)
+
     custom_distance_4_pairs = [[0, 4], [1, 6], [1, 8], [5, 8], [5, 9], [6, 8], [6, 9]]
+    custom_distance_4_pairs = AdjacencyMatrix(custom_distance_4_pairs)
 
     @staticmethod
     def triangular_neighbours(matrix):
@@ -46,7 +55,7 @@ class DegreeAndDiameterCalculatorTest(unittest.TestCase):
         for i in range(size):
             matrix.append([1] * size)
             matrix[i][i] = 0
-        return matrix
+        return AdjacencyMatrix(matrix)
 
     def check_paths_list(self, matrix: list, path_list: list, length: int):
         for i in range(len(path_list)):

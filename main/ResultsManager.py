@@ -8,6 +8,7 @@ class ResultsManager:
         project_dir = os.path.dirname(__file__)
         project_dir = project_dir.replace("genetic_manager", "")
         project_dir = project_dir.replace("misc", "")
+        project_dir = project_dir.replace("main", "")
         return os.path.join(project_dir, "results")
 
     @staticmethod

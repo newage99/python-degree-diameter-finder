@@ -1,8 +1,8 @@
 import unittest
 
-from symbols.interpretable_symbols.functions.operators.Operator import Operator
-from symbols.Symbol import Symbol
-from symbols.Id import Id
+from classes.interpretable_symbols.functions.operators.Operator import Operator
+from classes.Symbol import Symbol
+from classes.Id import Id
 
 
 def print_error(self, pos_to_mutate, id, char_to_mutate, char_to_mutate_to, prefix, suffix, j, error):
@@ -94,9 +94,8 @@ class IdTest(unittest.TestCase):
                     check_id(self=self, id=id, pos_to_mutate=pos, char_to_mutate=char_to_mutate,
                              char_to_mutate_to=char_to_mutate_to)
                     # check_id(self=self, id=final_id)
-                    print('  ' + str(prev_id) + " -> " + str(id) + " OK  pos=" + str(
-                        pos) + "  char_to_mutate=" + char_to_mutate + "  char_to_mutate_to=" + char_to_mutate_to + "  length=" + str(
-                        len(id)))
+                    print('  ' + str(prev_id) + " -> " + str(id) + " OK  pos=" + str(pos) + "  char_to_mutate=" +
+                          char_to_mutate + "  char_to_mutate_to=" + char_to_mutate_to + "  length=" + str(len(id)))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from symbols.Symbol import Symbol
+from classes.Symbol import Symbol
 from test.test_IdGenerator import check_id
 from misc.config import wanted_length
 
