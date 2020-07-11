@@ -1,6 +1,7 @@
 import math
 
 from main.DegreeAndDiameterCalculator import DegreeAndDiameterCalculator
+from misc.config import max_tree_ids
 from classes.AdjacencyMatrix import AdjacencyMatrix
 from classes.Id import Id
 
@@ -22,6 +23,9 @@ class GeneticTree:
 
     def get_last_child(self):
         return self.child.get_last_child() if self.child else self
+
+    def bad_score(self):
+        return self.degree >= 32 and self.diameter >= 1
 
     @property
     def score0(self):
@@ -53,11 +57,15 @@ class GeneticTree:
                         new_tree = GeneticTree([mutated_id], degree=score[0], diameter=score[1],
                                                score1=score[2] + score[3])
                         self.child = new_tree
+                        self.iterations_without_change = 0
                         return new_tree
                     elif self.is_score_equal_than_self(score):
                         equal_list.append(mutated_id)
+                        if len(self.ids) + len(equal_list) >= max_tree_ids:
+                            break
         if len(equal_list) > 0:
             self.ids += equal_list
+            self.iterations_without_change = 0
         else:
             self.iterations_without_change += 1
         return self

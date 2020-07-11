@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from misc.config import save_results_frequency
 from misc.config import iterations_without_change_before_preparing_to_delete
+from misc.config import max_tree_ids
 from main.ResultsManager import ResultsManager
 from main.GeneticTree import GeneticTree
 from classes.Id import Id
@@ -33,6 +34,8 @@ class GeneticTreeManager:
     def save_tree_list():
         if GeneticTreeManager.results_file_name is None:
             GeneticTreeManager.results_file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        print("Saving results... (Saving frequency: " + str(
+            save_results_frequency) + " iterations, filename: " + GeneticTreeManager.results_file_name + ")")
         str_to_write = "[\n\t"
         for i in range(len(GeneticTreeManager.initial_trees)):
             if i > 0:
@@ -50,7 +53,7 @@ class GeneticTreeManager:
 
     @staticmethod
     def delete_tree(pos):
-        new_connected_id = Id.random_connected_id()
+        new_connected_id = Id.random_connected_id(print_tries=True)
         new_genetic_tree = GeneticTree([new_connected_id])
         GeneticTreeManager.initial_trees[pos] = new_genetic_tree
         GeneticTreeManager.trees[pos] = new_genetic_tree
@@ -82,9 +85,6 @@ class GeneticTreeManager:
         GeneticTreeManager.__init_trees(number_of_trees, trees_list)
 
         for i in range(iterations):
-            if i % save_results_frequency == 0:
-                print("Auto-saving results... (Saving frequency: " + str(save_results_frequency) + " iterations)")
-                GeneticTreeManager.save_tree_list()
             print("Iteration " + str(i) + "/" + str(iterations - 1) + "...")
             sys.stdout.flush()
             for j in range(len(GeneticTreeManager.trees)):
@@ -95,17 +95,17 @@ class GeneticTreeManager:
                     GeneticTreeManager.trees[j] = new_tree
                     if new_tree != tree:
                         GeneticTreeManager.print_new_child(old_tree=tree, new_tree=new_tree, tree_number=j)
-                        # GeneticTreeManager.delete_all_prepared_to_delete_trees_worst_than(new_tree)
                     else:
-                        print(" New id on tree " + str(j) + ": " + str(tree.ids[0]) + " (degree=" + str(
-                            tree.degree) + ", diameter=" + str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
+                        print(" New id on tree " + str(j) + ": " + str(tree.ids[0]) + " (num_ids=" + str(len(tree.ids))
+                              + ", degree=" + str(tree.degree) + ", diameter=" + str(tree.diameter) + ", score1=" +
+                              str(tree.score1) + ")")
+                        if tree.bad_score() and len(tree.ids) >= max_tree_ids:
+                            GeneticTreeManager.delete_tree(j)
                     sys.stdout.flush()
                 else:
                     print(" Iterations without change on tree " + str(j) + ": " + str(tree.iterations_without_change) +
-                          " (degree=" + str(tree.degree) + ", diameter=" + str(tree.diameter) + ", score1=" +
-                          str(tree.score1) + ")")
-                    # if tree.iterations_without_change >= iterations_without_change_before_preparing_to_delete and \
-                    #         GeneticTreeManager.there_is_prepared_to_delete_tree_better_or_equal_than(tree):
-                    #     GeneticTreeManager.delete_tree(j)
-        print("Saving final results...")
+                          " ( num_ids=" + str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
+                          str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
+            if (i+1) % save_results_frequency == 0:
+                GeneticTreeManager.save_tree_list()
         GeneticTreeManager.save_tree_list()
