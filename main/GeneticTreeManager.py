@@ -22,7 +22,7 @@ class GeneticTreeManager:
             if trees_list:
                 GeneticTreeManager.initial_trees = trees_list
             while len(GeneticTreeManager.initial_trees) < number_of_trees:
-                new_id = Id.random_connected_id()
+                new_id = Id.random_connected_id(print_tries=True)
                 new_tree = GeneticTree([new_id])
                 GeneticTreeManager.initial_trees.append(new_tree)
             GeneticTreeManager.trees = []

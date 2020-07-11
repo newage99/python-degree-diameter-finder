@@ -181,12 +181,14 @@ class Id:
         return Id(new_id, length)
 
     @staticmethod
-    def random_connected_id():
+    def random_connected_id(print_tries: bool = False):
         from classes.AdjacencyMatrix import AdjacencyMatrix
         adjacency_matrix = AdjacencyMatrix.create_unconnected_matrix()
         while not adjacency_matrix.is_connected():
             new_id = Id.random()
             adjacency_matrix = AdjacencyMatrix.parse(new_id)
+            if print_tries:
+                print("Trying initial id: " + str(new_id))
         return new_id
 
     def __manage_symbol_at_pos(self, pos: int, additional_data: bool = False):

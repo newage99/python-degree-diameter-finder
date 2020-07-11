@@ -41,18 +41,10 @@ class GeneticTree:
         score1_equal_than_actual = score[2] + score[3] == self.score1
         return new_score0 == self.score0 and score1_equal_than_actual
 
-    def get_non_existing_id(self, id_to_mutate: Id):
-        mutated_id = id_to_mutate
-        c = 0
-        while mutated_id in self.ids and c < 10:
-            mutated_id = id_to_mutate.mutate()
-            c += 1
-        return mutated_id
-
     def mutate(self):
         equal_list = []
         for id in self.ids:
-            mutated_id = self.get_non_existing_id(id)
+            mutated_id = id.mutate()
             if mutated_id not in self.ids:
                 adjacency_matrix = AdjacencyMatrix.parse(mutated_id)
                 if adjacency_matrix.is_connected():

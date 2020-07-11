@@ -28,7 +28,7 @@ def push_number(a):
 
 
 def get_relative_path(abs_path: str):
-    folders = str(abs_path).split("/")
+    folders = abs_path.split("/" if "/" in abs_path else "\\")
     pos_of_root = folders.index("python-degree-diameter-finder")
     folders = folders[pos_of_root + 1:]
     return '/'.join(folders)
@@ -102,15 +102,15 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
                             break
                         except Exception as e:
                             pass
-                    klass = getattr(foo, str(path.split("/")[-1]).replace(".py", ""))
-                    obj = klass()
-                    they_implement_function = callable(getattr(obj, function_they_implement_name, None))
-                    if issubclass(klass, inherit_class) and they_implement_function:
-                        class_str = str(obj)
-                        if class_str in classes:
-                            classes[class_str].append(obj)
-                        else:
-                            classes[class_str] = [obj]
+                    klass = getattr(foo, str(path.split("/" if "/" in path else "\\")[-1]).replace(".py", ""))
+                    if issubclass(klass, inherit_class):
+                        obj = klass()
+                        if callable(getattr(obj, function_they_implement_name, None)):
+                            class_str = str(obj)
+                            if class_str in classes:
+                                classes[class_str].append(obj)
+                            else:
+                                classes[class_str] = [obj]
             except Exception as e:
                 pass
     return classes
