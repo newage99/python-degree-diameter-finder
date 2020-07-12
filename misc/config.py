@@ -1,5 +1,5 @@
 number_of_nodes = 33
-wanted_length = 32
+wanted_length = 4
 number_of_trees = 10
 save_results_frequency = 1
 iterations_without_change_before_preparing_to_delete = 3

@@ -13,6 +13,7 @@ As the interpreter keeps reading the expression, this list gets added functions 
 operators) waiting to be computed. When a function computes his input/s, it gets removed from the list.
 """
 functions = []
+slash = "\\" if sys.platform == "win32" else "/"
 
 
 def numbers_count():
@@ -28,16 +29,16 @@ def push_number(a):
 
 
 def get_relative_path(abs_path: str):
-    folders = abs_path.split("/" if "/" in abs_path else "\\")
+    folders = abs_path.split(slash)
     pos_of_root = folders.index("python-degree-diameter-finder")
     folders = folders[pos_of_root + 1:]
-    return '/'.join(folders)
+    return slash.join(folders)
 
 
 def __get_class(klass: str, folder: str):
     try:
         modules = sys.modules
-        folders = folder.split("/")
+        folders = folder.split(slash)
         module = modules[folders[0]]
         for i in range(1, len(folders)):
             module = getattr(module, folders[i])
@@ -78,7 +79,7 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
 
     if inherit_class:
 
-        symbols_folder_locations = [folder, "../" + folder]
+        symbols_folder_locations = [folder, ".." + slash + folder]
         location = None
         for possible_location in symbols_folder_locations:
             if isdir(possible_location):
@@ -88,7 +89,7 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
             exceptions = ["Symbol.py", "Function.py", "InterpretableSymbol.py", "Operator.py",
                           "SingleArgFunction.py", "Constant.py", "Number.py", "Variable.py"]
             paths = __recursively_get_files(location, exceptions)
-            symbols_folder_locations = ["", "./../"]
+            symbols_folder_locations = ["", "." + slash + ".." + slash]
             klass = None
             obj = None
             try:
@@ -102,7 +103,8 @@ def get_symbol_classes_that_inherit_from(class_they_inherit_from, function_they_
                             break
                         except Exception as e:
                             pass
-                    klass = getattr(foo, str(path.split("/" if "/" in path else "\\")[-1]).replace(".py", ""))
+                    path_split = path.split(slash)
+                    klass = getattr(foo, str(path_split[-1]).replace(".py", ""))
                     if issubclass(klass, inherit_class):
                         obj = klass()
                         if callable(getattr(obj, function_they_implement_name, None)):

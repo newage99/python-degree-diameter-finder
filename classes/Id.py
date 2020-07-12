@@ -283,6 +283,26 @@ class Id:
             prev_symbol = symbols[-1]
         return Id(symbols)
 
+    def check(self):
+        if self[0] not in Symbol.starting_symbols():
+            return "Id starts with an invalid character."
+        elif self[-1] not in Symbol.ending_symbols():
+            return "Id ends with an invalid character."
+        parenthesis_counter = 0
+        for i in range(len(self)):
+            if i > 0 and not Symbol.check(self[i-1], self[i]):
+                return (' ' * i) + '^ char \'' + str(self[i - 1]) + '\' must not be followed by char \'' + str(
+                    self[i]) + '\''
+            if str(self[i]) == '(':
+                parenthesis_counter += 1
+            elif str(self[i]) == ')':
+                if parenthesis_counter <= 0:
+                    return "Found close parenthesis when there's no open parenthesis to close."
+                parenthesis_counter -= 1
+        if parenthesis_counter != 0:
+            return "Incorrect number of parenthesis."
+        return None
+
     # -- MAGIC METHODS OVERRIDES -- #
 
     def copy(self):

@@ -1,22 +1,27 @@
 from classes.Symbol import Symbol
-from test.test_IdGenerator import check_id
+from classes.Id import Id
 from misc.config import wanted_length
+
+num = 0
+
+
+def recursively_create_ids(i: int, symbols_to_check: list, symbols: list):
+    global num
+    for symbol in symbols_to_check:
+        if Symbol.check(symbols[-1] if len(symbols) > 0 else None, symbol):
+            symbols.append(symbol)
+            if i + 1 == wanted_length:
+                id = Id(symbols)
+                if id.check() is None:
+                    print(str(id))
+                num += 1
+            else:
+                recursively_create_ids(i + 1, Symbol.symbols() if i + 2 < wanted_length else Symbol.ending_symbols(),
+                                       symbols)
+            symbols.pop()
 
 
 if __name__ == '__main__':
-    symbol_chars = list(Symbol.symbols_dict().keys())
-    starting_symbols = Symbol.starting_symbols()
-    ending_symbols = Symbol.ending_symbols()
-    num = 0
-    for start_symbol in starting_symbols:
-        for symbol_char in symbol_chars:
-            symbol = Symbol.parse(symbol_char, start_symbol)
-            if symbol:
-                for end_symbol in ending_symbols:
-                    end_symbol = Symbol.parse(end_symbol.symbol(), symbol)
-                    if end_symbol:
-                        id = start_symbol.symbol() + symbol_char + end_symbol.symbol()
-                        print(id)
-                        num += 1
+    recursively_create_ids(0, Symbol.starting_symbols(), [])
     print("")
-    print(num)
+    print("Number of created ids: " + str(num))
