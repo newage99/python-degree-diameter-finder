@@ -24,7 +24,7 @@ class ResultsManager:
             os.makedirs(results_dir)
         results_file_path = ResultsManager.get_result_file_path(file_name, results_dir)
         try:
-            f = open(results_file_path, "w+")
+            f = open(results_file_path, "w+", encoding="utf-8")
             f.write(results)
             f.close()
         except Exception as e:
