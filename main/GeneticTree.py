@@ -24,6 +24,9 @@ class GeneticTree:
     def get_last_child(self):
         return self.child.get_last_child() if self.child else self
 
+    def bad_score(self):
+        return self.degree >= 31 and self.diameter >= 1
+
     @property
     def score0(self):
         return self.degree + self.diameter
