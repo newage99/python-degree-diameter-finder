@@ -24,9 +24,6 @@ class GeneticTree:
     def get_last_child(self):
         return self.child.get_last_child() if self.child else self
 
-    def bad_score(self):
-        return self.degree >= 32 and self.diameter >= 1
-
     @property
     def score0(self):
         return self.degree + self.diameter
@@ -47,7 +44,8 @@ class GeneticTree:
 
     def mutate(self):
         equal_list = []
-        for id in self.ids:
+        for i in range(len(self.ids)):
+            id = self.ids[i]
             mutated_id = id.mutate()
             if mutated_id not in self.ids:
                 adjacency_matrix = AdjacencyMatrix.parse(mutated_id)
@@ -61,8 +59,8 @@ class GeneticTree:
                         return new_tree
                     elif self.is_score_equal_than_self(score):
                         equal_list.append(mutated_id)
-                        if len(self.ids) + len(equal_list) >= max_tree_ids:
-                            break
+                        print("  Id " + str(id) + " (" + str(i) + "/" + str(len(self.ids)) +
+                              ") mutated to equal score id " + str(mutated_id))
         if len(equal_list) > 0:
             self.ids += equal_list
             self.iterations_without_change = 0

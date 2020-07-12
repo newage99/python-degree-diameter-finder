@@ -89,22 +89,26 @@ class GeneticTreeManager:
             sys.stdout.flush()
             for j in range(len(GeneticTreeManager.trees)):
                 tree = GeneticTreeManager.trees[j]
-                num_ids = len(tree.ids)
+                num_ids_prev_to_mutate = len(tree.ids)
                 new_tree = tree.mutate()
-                if new_tree != tree or len(new_tree.ids) != num_ids:
+                num_new_ids = len(new_tree.ids) - num_ids_prev_to_mutate
+                if new_tree != tree or num_new_ids > 0:
                     GeneticTreeManager.trees[j] = new_tree
                     if new_tree != tree:
                         GeneticTreeManager.print_new_child(old_tree=tree, new_tree=new_tree, tree_number=j)
                     else:
-                        print(" New id on tree " + str(j) + ": " + str(tree.ids[0]) + " (num_ids=" + str(len(tree.ids))
-                              + ", degree=" + str(tree.degree) + ", diameter=" + str(tree.diameter) + ", score1=" +
-                              str(tree.score1) + ")")
-                        if tree.bad_score() and len(tree.ids) >= max_tree_ids:
-                            GeneticTreeManager.delete_tree(j)
+                        if num_new_ids == 1:
+                            print(" New id on tree " + str(j) + ": " + str(tree.ids[0]) + " (num_ids=" +
+                                  str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
+                                  str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
+                        else:
+                            print(" " + str(num_new_ids) + " new ids on tree " + str(j) + " (num_ids=" +
+                                  str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
+                                  str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
                     sys.stdout.flush()
                 else:
                     print(" Iterations without change on tree " + str(j) + ": " + str(tree.iterations_without_change) +
-                          " ( num_ids=" + str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
+                          " (num_ids=" + str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
                           str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
             if (i+1) % save_results_frequency == 0:
                 GeneticTreeManager.save_tree_list()
