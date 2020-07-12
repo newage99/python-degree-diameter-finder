@@ -105,6 +105,8 @@ class GeneticTreeManager:
                             print(" " + str(num_new_ids) + " new ids on tree " + str(j) + " (num_ids=" +
                                   str(len(tree.ids)) + ", degree=" + str(tree.degree) + ", diameter=" +
                                   str(tree.diameter) + ", score1=" + str(tree.score1) + ")")
+                        if tree.bad_score() and len(tree.ids) >= max_tree_ids:
+                            GeneticTreeManager.delete_tree(j)
                     sys.stdout.flush()
                 else:
                     print(" Iterations without change on tree " + str(j) + ": " + str(tree.iterations_without_change) +
