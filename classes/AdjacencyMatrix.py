@@ -9,6 +9,7 @@ from misc.config import number_of_nodes
 class AdjacencyMatrix:
 
     def __init__(self, matrix: list):
+        self.__number_of_elements_from_biggest_component = 1
         self.__matrix = matrix
         self.__is_connected = None
         self.is_connected()
@@ -28,11 +29,14 @@ class AdjacencyMatrix:
             first_component_length = 0
             for c in components:
                 first_component_length = len(c)
+                if len(c) > self.__number_of_elements_from_biggest_component:
+                    self.__number_of_elements_from_biggest_component = len(c)
                 number_of_components += 1
-                if number_of_components >= 2:
-                    break
-            self.__is_connected = number_of_components == 1 and first_component_length == n
+            self.__is_connected = number_of_components == 1 and first_component_length
         return self.__is_connected
+
+    def get_number_of_elements_from_biggest_component(self):
+        return self.__number_of_elements_from_biggest_component
 
     @staticmethod
     def create_unconnected_matrix():
