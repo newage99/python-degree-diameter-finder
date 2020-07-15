@@ -1,4 +1,4 @@
-import sys
+import math
 
 from classes.Symbol import Symbol
 from classes.Id import Id
@@ -49,6 +49,18 @@ if __name__ == '__main__':
     # from classes.interpretable_symbols.functions.operators.Subtraction import Subtraction
     # from classes.numbers.constants.Two import Two
     # score = DegreeAndDiameterCalculator.calculate(AdjacencyMatrix.parse(Id([AxisY(), Subtraction(), Two(), Subtraction(), AxisX()])))
+
+    symbols = Symbol.symbols()
+    num_symbols = len(symbols)
+    n = int(math.pow(num_symbols, wanted_length))
+
+    print("Number of iterations: " + str(n))
+
+    chars = " " * wanted_length
+
+    for i in range(n):
+        if i % num_symbols == 0:
+            pass
 
     recursively_create_ids(0, Symbol.starting_symbols(), [])
     print("")
